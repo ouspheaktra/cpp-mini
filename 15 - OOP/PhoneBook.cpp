@@ -3,16 +3,25 @@
 using namespace std;
 
 class PhoneBookItem {
-	char *name = new char[30], *tel = new char[10];
+	char *name = NULL, *tel = NULL;
 public:
 	PhoneBookItem * next = NULL;
-	PhoneBookItem(char* _name, char* _tel) {
-		strcpy(name, _name);
-		strcpy(tel, _tel);
+	PhoneBookItem(const char* _name, const char* _tel) {
+		if (name)	delete []name;
+		if (tel)	delete []tel;
+		if (_name) {
+			name = new char[strlen(_name) + 1];
+			strcpy(name, _name);
+		} else
+			name = NULL;
+		if (_tel) {
+			tel = new char[strlen(_tel) + 1];
+			strcpy(tel, _tel);	
+		} else
+			tel = NULL;
 	}
 	~PhoneBookItem() {
-		delete []name;
-		delete []tel;
+		this(NULL, NULL);
 	}
 	char* GetName() {
 		return name;
@@ -73,9 +82,10 @@ int main() {
 	PhoneBook book;
 	book.Add(new PhoneBookItem("Ouspheaktra", "010547560"));
 	book.CoutAll();
-	book.RemoveByName("Ouspheaktra");
-	book.CoutAll();
-	book.Add(new PhoneBookItem("Kimly", "35454"));
-	book.Add(new PhoneBookItem("Ouspheaktra", "010547560"));
-	book.CoutAll();
+	cout << "end";
+	//book.RemoveByName("Ouspheaktra");
+	//book.CoutAll();
+	//book.Add(new PhoneBookItem("Kimly", "35454"));
+	//book.Add(new PhoneBookItem("Ouspheaktra", "010547560"));
+	//book.CoutAll();
 }
