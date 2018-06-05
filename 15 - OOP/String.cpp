@@ -7,8 +7,7 @@ class String {
 public:
 	/* CONSTRUCTOR */
 	String() {
-		value = new char[80];
-		value[0] = '\0';
+		value = new char[80] = {'\0'};
 	}
 	String(char c) {
 		value = new char[2];
@@ -18,6 +17,7 @@ public:
 	String(const char *s) {
 		SetValue(s);
 	}
+	// Copy
 	String(const String &s) {
 		SetValue(s.value);
 	}
@@ -60,7 +60,10 @@ public:
 	operator char*() {
 		return value;
 	}
-	bool operator== (String &str) {
+	void operator= (const String &str) {
+		SetValue(str.value);
+	}
+	bool operator== (const String &str) {
 		return (strcmp(value, str.value) == 0);
 	}
 	String operator+ (const String &str) {
@@ -70,40 +73,31 @@ public:
 		return String(newstr);
 	}
 	String operator- (const String &str) {
-		char *out = new char[strlen(value) + 1];
-		out[0] = '\0';
+		char out[strlen(value) + 1] = {'\0'};
 		char *start = value;
 		char *pos;
-		while (1) {
-			pos = strstr(start, str.value);
-			if (pos) {
-				strcat(out, String(start).SubString(0, pos - start));
-				//if (po + strlen(str.value) < str + strlen(str))
-					start = pos + strlen(str.value);
-			} else {
-				strcat(out, start);
-				break;
-			}
-			
-		};
+		char tmp[strlen(value) + 1];
+		while (pos = strstr(start, str.value)) {
+			strncpy(tmp, start, pos - start);
+			tmp[pos - start] = '\0';
+			strcat(out, tmp);
+			start = pos + strlen(str.value);
+		}
+		strcat(out, start);
 		return String(out);
 	}
 	String operator* (const String &str) {
-		char out[max(strlen(str.value), strlen(value)) + 1];
-		int l = 0;
-		out[0] = '\0';
-		for (int i = 0, n = strlen(value); i < n; i++) {
+		char out[min(strlen(str.value), strlen(value)) + 1] = {'\0'};
+		for (int i = 0, l = 0, n = strlen(value); i < n; i++)
 			if (strchr(str.value, value[i]) && !strchr(out, value[i])) {
 				out[l] = value[i];
-				out[l+1] = '\0';
-				l++;
+				out[l++ + 1] = '\0';
 			}
-		}
 		return String(out);
 	}
 	String operator/ (const String &str) {
-		char out[max(strlen(str.value), strlen(value)) + 1];
-		char l = 0;
+		char out[strlen(str.value) + strlen(value) + 1];
+		int l = 0;
 		for (int i = 0, n = strlen(value); i < n; i++)
 			if (!strchr(str.value, value[i]))
 				out[l++] = value[i];
@@ -115,6 +109,6 @@ public:
 	}
 };
 
-int main () {
-  cout << String("helolo asdf aslo asdf sd") - String("lo");
+int main() {
+  cout << String("monday tuesday tomordrow day hi") - String("day");
 }

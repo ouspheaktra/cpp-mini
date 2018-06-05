@@ -1,41 +1,84 @@
 #include <iostream>
+#include <string.h>
 using namespace std;
 
 class Fraction {
 	int numerator, denominator;
 	
-	public:
-	Fraction(int n, int d) {
-		numerator = n;
-		denominator = d;
+public:
+	Fraction(int numerator, int denominator) : numerator(numerator),denominator(denominator) { }
+	Fraction(int numerator) : Fraction(numerator, 1) { }
+	Fraction() : Fraction(1) { }
+	
+	operator char* () {
+		char out[100] = {'\0'};
+		char tmp[20] = {'\0'};
+		itoa(numerator, tmp, 10);
+		strcat(out, tmp);
+		strcat(out, "/");
+		itoa(denominator, tmp, 10);
+		strcat(out, tmp);
+		
+		char *str = new char[strlen(out) + 1];
+		strcpy(str, out);
+		return str;
 	}
-	int GetNumerator() {
-		return numerator;
+	void operator+= (Fraction f) {
+		*this = *this + f;
 	}
-	int GetDenominator() {
-		return denominator;
+	void operator-= (Fraction f) {
+		*this = *this - f;
 	}
-	void Add(Fraction other) {
-		numerator = numerator*other.GetDenominator() + denominator*other.GetNumerator();
-		denominator *= other.GetDenominator();
+	void operator*= (Fraction f) {
+		*this = *this * f;
 	}
-	void Subtract(Fraction other) {
-		numerator = numerator*other.GetDenominator() - denominator*other.GetNumerator();
-		denominator *= other.GetDenominator();
+	void operator/= (Fraction f) {
+		*this = *this / f;
 	}
-	void Multiply(Fraction other) {
-		numerator *= other.GetNumerator();
-		denominator *= other.GetDenominator();
+	Fraction operator++ () {
+		*this += Fraction(1);
+		return *this;
 	}
-	void Divide(Fraction other) {
-		numerator *= other.GetDenominator();
-		denominator *= other.GetNumerator();
+	Fraction operator++ (int post) {
+		Fraction f = *this;
+		*this += Fraction(1);
+		return f;
+	}
+	Fraction operator-- () {
+		*this -= Fraction(1);
+		return *this;
+	}
+	Fraction operator-- (int post) {
+		Fraction f = *this;
+		*this -= Fraction(1);
+		return f;
+	}
+	Fraction operator+ (Fraction f) {
+		return Fraction(
+			numerator*f.denominator + denominator*f.numerator,
+			denominator*f.denominator
+		);
+	}
+	Fraction operator- (Fraction f) {
+		return Fraction(
+			numerator*f.denominator - denominator*f.numerator,
+			denominator*f.denominator
+		);
+	}
+	Fraction operator* (Fraction f) {
+		return Fraction(
+			numerator*f.numerator,
+			denominator*f.denominator
+		);
+	}
+	Fraction operator/ (Fraction f) {
+		return Fraction(
+			numerator*f.denominator,
+			denominator*f.numerator
+		);
 	}
 };
 
 int main() {
-	Fraction	one(2, 3),
-				two(3, 4);
-	one.Add(two);
-	cout << one.GetNumerator() << "\n---\n" << one.GetDenominator();
+	Fraction f(2, 5);
 }
