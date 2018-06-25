@@ -7,7 +7,8 @@ class String {
 public:
 	/* CONSTRUCTOR */
 	String() {
-		value = new char[80] = {'\0'};
+		value = new char[80];
+		value[0] = '\0';
 	}
 	String(char c) {
 		value = new char[2];
