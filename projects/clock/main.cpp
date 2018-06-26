@@ -1,11 +1,11 @@
 #include <windows.h>
-#include "time.h"
-#include "string.h"
-#include "draw.h"
-#include "geometry.h"
+#include "..\..\classes\time.h"
+#include "..\..\classes\string.h"
+#include "..\..\classes\winapi.h"
+#include "..\..\classes\geometry.h"
 
 Time t;
-Draw draw;
+Draw draw;//
 
 /* This is where all the input to the window goes to */
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
@@ -44,7 +44,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 				}
 			}
 			
-			POINT	ph = Circle(center.x, center.y, 90).GetPointAtDegree(360/12*t.GetHour() + 270),
+			POINT	ph = Circle(center.x, center.y, 80).GetPointAtDegree(360/12*t.GetHour() + 270),
 					pm = Circle(center.x, center.y, 110).GetPointAtDegree(360/60*t.GetMinute() + 270),
 					ps = cl.GetPointAtDegree(360/60*t.GetSecond() + 270);
 					
@@ -52,7 +52,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 			draw.Line(center.x, center.y, ps.x, ps.y);
 			draw.SetWidth(3);
 			draw.Line(center.x, center.y, pm.x, pm.y);
-			draw.SetWidth(5);
+			draw.SetWidth(6);
 			draw.Line(center.x, center.y, ph.x, ph.y);
 			
 			return DefWindowProc(hwnd, Message, wParam, lParam);
