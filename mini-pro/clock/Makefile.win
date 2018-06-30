@@ -1,0 +1,40 @@
+# Project: Project1
+# Makefile created by Dev-C++ 5.11
+
+CPP      = g++.exe -D__DEBUG__
+CC       = gcc.exe -D__DEBUG__
+WINDRES  = windres.exe
+OBJ      = main.o ../../classes/string.o ../../classes/time.o ../../classes/winapi.o ../../classes/geometry.o
+LINKOBJ  = main.o ../../classes/string.o ../../classes/time.o ../../classes/winapi.o ../../classes/geometry.o
+LIBS     = -L"C:/Program Files/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -mwindows -m32 -g3
+INCS     = -I"C:/Program Files/Dev-Cpp/MinGW64/include" -I"C:/Program Files/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
+CXXINCS  = -I"C:/Program Files/Dev-Cpp/MinGW64/include" -I"C:/Program Files/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
+BIN      = clock.exe
+CXXFLAGS = $(CXXINCS) -m32 -g3
+CFLAGS   = $(INCS) -m32 -g3
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+main.o: main.cpp
+	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
+
+../../classes/string.o: ../../classes/string.cpp
+	$(CPP) -c ../../classes/string.cpp -o ../../classes/string.o $(CXXFLAGS)
+
+../../classes/time.o: ../../classes/time.cpp
+	$(CPP) -c ../../classes/time.cpp -o ../../classes/time.o $(CXXFLAGS)
+
+../../classes/winapi.o: ../../classes/winapi.cpp
+	$(CPP) -c ../../classes/winapi.cpp -o ../../classes/winapi.o $(CXXFLAGS)
+
+../../classes/geometry.o: ../../classes/geometry.cpp
+	$(CPP) -c ../../classes/geometry.cpp -o ../../classes/geometry.o $(CXXFLAGS)
