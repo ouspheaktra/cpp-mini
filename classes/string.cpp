@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <tchar.h>
+#include <stdarg.h>
 #include "string.h"
 
 /* CONSTRUCTOR */
@@ -9,6 +10,9 @@ String::String() {
 	value[0] = '\0';
 }
 String::String(const TCHAR *s) {
+	SetValue(s);
+}
+String::String(const char *s) {
 	SetValue(s);
 }
 String::String(double number) {
@@ -24,7 +28,7 @@ String::String(const String &s) {
 
 /* DESTRUCTOR */
 String::~String() {
-	SetValue("");
+	SetValue(NULL);
 }
 
 /* METHOD */
@@ -32,19 +36,44 @@ void String::SetValue(const TCHAR *s) {
 	if (value)
 		delete [] value;
 	if (s) {
-		value = new char[_tcslen(s) + 1];
-		strcpy(value, s);
+		value = new TCHAR[_tcslen(s) + 1];
+		_tcscpy(value, s);
 	} else
 		value = NULL;
 }
+void String::SetValue(const char *s) {
+	int len = strlen(s) + 1;
+	TCHAR *t = new TCHAR[len];
+	for (int i = 0; i < len; i++)
+		t[i] = s[i];
+	SetValue(t);
+	delete[] t;
+}
+/*
+void String::SetValue(const TCHAR *format, ...) {
+	va_list list;
+	va_start(list, format);
+	for (int i = 0, n = strlen(format); i < n; i++) {
+		if (format[i] == '%') {
+			switch (format[i+1]) {
+				case 'd':	cout << va_arg(list, int);		break;
+				case 's':	cout << va_arg(list, TCHAR *);	break;
+			}
+			i++;
+		} else
+			cout << format[i];
+	}
+	va_end(list);
+}
+*/
 void String::SetValue(double num) {
 	TCHAR tmp[20] = {'\0'};
-	_stprintf(tmp, "%f", num);
+	_stprintf(tmp, _TEXT("%f"), num);
 	SetValue(tmp);
 }
 void String::SetValue(int num) {
 	TCHAR tmp[20] = {'\0'};
-	_stprintf(tmp, "%d", num);
+	_stprintf(tmp, _TEXT("%d"), num);
 	SetValue(tmp);
 }
 int String::ToInt() {
@@ -82,12 +111,14 @@ void String::operator= (const String &str) {
 bool String::operator== (const String &str) {
 	return (_tcscmp(value, str.value) == 0);
 }
+
 String String::operator+ (const String &str) {
-	char newstr[_tcslen(str.value) + _tcslen(value) + 1];
+	TCHAR *newstr = new TCHAR[_tcslen(str.value) + _tcslen(value) + 1];
 	_tcscpy(newstr, value);
 	_tcscat(newstr, str.value);
 	return String(newstr);
 }
+/*
 String String::operator- (const String &str) {
 	TCHAR out[_tcslen(value) + 1] = {'\0'};
 	TCHAR *start = value;
@@ -123,3 +154,8 @@ String String::operator/ (const String &str) {
 	out[l] = '\0';
 	return String(out);
 }
+
+int main() {
+	cout << "yes";
+}
+*/

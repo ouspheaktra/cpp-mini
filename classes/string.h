@@ -8,6 +8,7 @@ class String {
 public:
 	/* CONSTRUCTOR */
 	String();
+	String(const char *s);
 	String(const TCHAR *s);
 	String(double number);
 	String(int number);
@@ -19,6 +20,7 @@ public:
 	
 	/* METHOD */
 	void SetValue(const TCHAR *s);
+	void SetValue(const char *s);
 	void SetValue(double num);
 	void SetValue(int num);
 	int ToInt();
