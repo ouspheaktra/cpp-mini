@@ -6,15 +6,16 @@
 
 /* CONSTRUCTOR */
 String::String() {
-	value = new TCHAR[80];
-	value[0] = '\0';
+	Empty();
 }
 String::String(const TCHAR *s) {
 	SetValue(s);
 }
+#ifdef _UNICODE
 String::String(const char *s) {
 	SetValue(s);
 }
+#endif
 String::String(double number) {
 	SetValue(number);
 }
@@ -28,7 +29,8 @@ String::String(const String &s) {
 
 /* DESTRUCTOR */
 String::~String() {
-	SetValue(NULL);
+	if (value)
+		delete[] value;
 }
 
 /* METHOD */
@@ -38,9 +40,11 @@ void String::SetValue(const TCHAR *s) {
 	if (s) {
 		value = new TCHAR[_tcslen(s) + 1];
 		_tcscpy(value, s);
-	} else
-		value = NULL;
+	}
+	else
+		Empty();
 }
+#ifdef _UNICODE
 void String::SetValue(const char *s) {
 	int len = strlen(s) + 1;
 	TCHAR *t = new TCHAR[len];
@@ -49,6 +53,7 @@ void String::SetValue(const char *s) {
 	SetValue(t);
 	delete[] t;
 }
+#endif
 /*
 void String::SetValue(const TCHAR *format, ...) {
 	va_list list;
@@ -76,6 +81,12 @@ void String::SetValue(int num) {
 	_stprintf(tmp, _TEXT("%d"), num);
 	SetValue(tmp);
 }
+void String::Empty() {
+	if (value != NULL)
+		delete [] value;
+	value = new TCHAR[1];
+	value[0] = '\0';
+}
 int String::ToInt() {
 	return _ttoi(value);
 }
@@ -90,6 +101,22 @@ void String::Cin() {
 const TCHAR * String::GetValue() {
 	return value;
 }
+#ifdef _UNICODE
+const TCHAR * String::ToTCHAR() {
+	return value;
+}
+const char * String::ToChar() {
+	if (sizeof(TCHAR) == sizeof(char))
+		return (char *)value;
+	char *out = new char[Length() + 1];
+	wcstombs(out, value, Length() + 1);
+	return out;
+}
+#else
+const char * String::ToChar() {
+	return value;
+}
+#endif
 int String::Length() {
 	return _tcslen(value);
 }
@@ -100,10 +127,20 @@ String String::SubString(int start, int length) {
 	str[length] = '\0';
 	return String(str);
 }
-
+/*
+String::operator char*() {
+	char *out = new char[Length() + 1];
+	for (int i = 0, n = Length() + 1; i < n; i++)
+		out[i] = value[i];
+	return out;
+}
+*/
 /* OPERATOR */
 String::operator TCHAR* () {
 	return value;
+}
+String::operator bool() {
+	return !(*this == String(""));
 }
 void String::operator= (const String &str) {
 	SetValue(str.value);
@@ -112,11 +149,19 @@ bool String::operator== (const String &str) {
 	return (_tcscmp(value, str.value) == 0);
 }
 
+bool String::operator!=(const String & str) {
+	return !(*this == str);
+}
+
 String String::operator+ (const String &str) {
 	TCHAR *newstr = new TCHAR[_tcslen(str.value) + _tcslen(value) + 1];
 	_tcscpy(newstr, value);
 	_tcscat(newstr, str.value);
 	return String(newstr);
+}
+String String::operator+= (const String &str) {
+	*this = *this + str;
+	return *this;
 }
 /*
 String String::operator- (const String &str) {

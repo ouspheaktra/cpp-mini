@@ -8,7 +8,9 @@ class String {
 public:
 	/* CONSTRUCTOR */
 	String();
+#ifdef _UNICODE
 	String(const char *s);
+#endif
 	String(const TCHAR *s);
 	String(double number);
 	String(int number);
@@ -20,23 +22,35 @@ public:
 	
 	/* METHOD */
 	void SetValue(const TCHAR *s);
+#ifdef _UNICODE
 	void SetValue(const char *s);
+#endif
 	void SetValue(double num);
 	void SetValue(int num);
+	void Empty();
 	int ToInt();
 	double ToDouble();
 	void Cin();
 	const TCHAR * GetValue();
+#ifdef _UNICODE
+	const TCHAR * ToTCHAR();
+	const char * ToChar();
+#else
+	const char * ToChar();
+#endif
 	int Length();
 	String SubString(int start, int length);
 	
 	/* OPERATOR */
 	operator TCHAR* ();
+	operator bool();
 	void operator= (const String &str);
 	bool operator== (const String &str);
+	bool operator!= (const String &str);
 	String operator+ (const String &str);
 	String operator- (const String &str);
 	String operator* (const String &str);
 	String operator/ (const String &str);
+	String operator+= (const String &str);
 };
 #endif
