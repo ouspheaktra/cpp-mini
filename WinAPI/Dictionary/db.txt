@@ -1,0 +1,56 @@
+---
+int
+interger
+asdfasdf
+afasdf
+aasdfadfsdfasdf
+---
+float
+floating point number
+asdfasdf
+asdfja
+asasdfaerqwe wer qwe
+---
+bool
+boolean asdfalsdjf
+true is not 0
+false is 0
+---
+byte
+1 byte = 8 bits
+asdf
+asqwerqdf
+asdfqwrq
+
+qurquwwer
+asdf
+---
+hello
+world
+---
+new
+sdfja asdfa new
+---
+another
+asf asldfjal;oaw ajjalsf asoei
+---
+newagain
+sdfjasl asdfjas;dfa asdf
+---
+DAADA
+ASDJFOW WORU QOWE ROQWEU R
+---
+hahah
+asdfiowur
+---
+very new
+asf oweir asd asdoiwera sdf aweir
+---
+very very very
+asdjfa new a sfa
+---
+1201
+thsis ais  aneubjaer
+---
+another another test
+asjfa a sdfas jf;ajsdf;a
