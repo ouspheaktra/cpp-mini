@@ -3,10 +3,6 @@
 
 #include "stdafx.h"
 #include "Jackpot.h"
-#include "resource.h"
-#include <cstdlib>
-#include <ctime>
-#include "..\..\classes\winapi.h"
 
 
 #define MAX_LOADSTRING 100
@@ -169,7 +165,7 @@ public:
 		HBITMAP hbmWindow = CreateCompatibleBitmap(hdcWindow, 200, 200 * (size + 3));
 		hdc = CreateCompatibleDC(hdcWindow);
 		SelectObject(hdc, hbmWindow);
-		Draw draw;
+		DRAW draw;
 		draw.Begin(hdc);
 		for (int i = 0, n = size + 3; i < n; i++)
 			draw.Image(IDB[i < size ? i : i-size], 0, 200 * i);

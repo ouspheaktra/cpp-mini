@@ -19,5 +19,5 @@
 
 
 // TODO: reference additional headers your program requires here
+#include "Resource.h"
 #include "../../classes/winapi.h"
-#include <ctime>

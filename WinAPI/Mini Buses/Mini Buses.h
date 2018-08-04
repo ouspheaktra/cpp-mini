@@ -36,7 +36,7 @@ public:
 class Stop {
 	Passenger **passengers;
 	int passengersAmount;
-	POINT coord;
+	Point coord;
 public:
 	int id;
 	Stop() : passengersAmount(0), passengers(NULL) {};
@@ -45,7 +45,7 @@ public:
 		coord.x = x;
 		coord.y = y;
 	}
-	void SetCoord(POINT coord) {
+	void SetCoord(Point coord) {
 		this->coord = coord;
 	}
 	int GetPassengersAmount() {
@@ -54,7 +54,7 @@ public:
 	Passenger *GetPassenger(int id) {
 		return passengers[id];
 	}
-	POINT GetCoord() {
+	Point GetCoord() {
 		return coord;
 	}
 
@@ -156,12 +156,12 @@ public:
 		going = true;
 	}
 
-	POINT GetCoord() {
-		POINT s1 = from->GetCoord();
+	Point GetCoord() {
+		Point s1 = from->GetCoord();
 		if (!going)
 			return s1;
-		POINT s2 = to->GetCoord();
-		POINT p;
+		Point s2 = to->GetCoord();
+		Point p;
 		p.x = s1.x + (s2.x - s1.x)*percentageToNextStop;
 		p.y = s1.y + (s2.y - s1.y)*percentageToNextStop;
 		return p;

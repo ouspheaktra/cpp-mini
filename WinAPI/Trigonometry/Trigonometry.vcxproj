@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C769BB65-9819-49F0-8BB3-19F0F7C00FAA}</ProjectGuid>
+    <ProjectGuid>{AACE792D-1A80-43B4-9FDE-73BE71797FB9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>MiniBuses</RootNamespace>
+    <RootNamespace>Trigonometry</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -148,10 +148,10 @@
     <ClInclude Include="..\..\classes\geometry.h" />
     <ClInclude Include="..\..\classes\string.h" />
     <ClInclude Include="..\..\classes\winapi.h" />
-    <ClInclude Include="Mini Buses.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Trigonometry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\classes\geometry.cpp">
@@ -163,20 +163,20 @@
     <ClCompile Include="..\..\classes\winapi.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Mini Buses.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Trigonometry.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Mini Buses.rc" />
+    <ResourceCompile Include="Trigonometry.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Mini Buses.ico" />
     <Image Include="small.ico" />
+    <Image Include="Trigonometry.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

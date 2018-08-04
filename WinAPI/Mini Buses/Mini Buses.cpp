@@ -2,10 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "../../classes/string.h"
 #include "Mini Buses.h"
-#include "../../classes/winapi.h"
-#include <ctime>
 
 #define MAX_LOADSTRING 100
 // Global Variables:
@@ -173,7 +170,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - post a quit message and return
 //
 //
-Draw draw;
+DRAW Draw;
 double minutes = 0;
 int minutesPerPassenger = 10;
 int minutesPerBus = 35;
@@ -204,45 +201,45 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             
-			// TODO: Add any drawing code that uses hdc here...
-			draw.Begin(hdc);
+			// TODO: Add any Drawing code that uses hdc here...
+			Draw.Begin(hdc);
 
-			// draw paths
-			draw.SetBackgroundColor(RGB(0, 0, 0));
-			draw.SetColor(RGB(0, 0, 0));
-			POINT prevPoint, curPoint;
+			// Draw paths
+			Draw.SetBackgroundColor(RGB(0, 0, 0));
+			Draw.SetColor(RGB(0, 0, 0));
+			Point prevPoint, curPoint;
 			for (int i = 0; i < stopsAmount; i++) {
 				if (i == 0) {
 					prevPoint.x = 0;
 					prevPoint.y = 200;
 				}
 				curPoint = stops[i].GetCoord();
-				draw.Line(prevPoint.x, prevPoint.y, curPoint.x, curPoint.y);
-				draw.Circle(curPoint.x, curPoint.y, 10);
+				Draw.Line(prevPoint.x, prevPoint.y, curPoint.x, curPoint.y);
+				Draw.Circle(curPoint.x, curPoint.y, 10);
 				prevPoint = curPoint;
 			}
-			draw.Line(prevPoint.x, prevPoint.y, prevPoint.x+500, 200);
+			Draw.Line(prevPoint.x, prevPoint.y, prevPoint.x+500, 200);
 
-			// draw buses
-			POINT p;
+			// Draw buses
+			Point p;
 			for (int i = 0; i < busesAmount; i++) {
 				if (buses[i].isGoing()) {
 					p = buses[i].GetCoord();
 					p.x -= 25;
 					p.y -= 50;
-					draw.Text(String("seat: ") + String(buses[i].GetSeatAmount()), p.x, p.y - 75);
-					draw.Text(String("available: ") + String(buses[i].GetSeatAmount() - buses[i].GetPassengersAmount()), p.x, p.y - 50);
-					draw.Text(String("passenger: ") + String(buses[i].GetPassengersAmount()), p.x, p.y - 25);
-					draw.Rectangle(p.x, p.y, 50, 25);
+					Draw.Text(String("seat: ") + String(buses[i].GetSeatAmount()), p.x, p.y - 75);
+					Draw.Text(String("available: ") + String(buses[i].GetSeatAmount() - buses[i].GetPassengersAmount()), p.x, p.y - 50);
+					Draw.Text(String("passenger: ") + String(buses[i].GetPassengersAmount()), p.x, p.y - 25);
+					Draw.Rectangle(p.x, p.y, 50, 25);
 				}
 			}
-			// draw passengers
+			// Draw passengers
 			for (int i = 0, j, m; i < stopsAmount; i++) {
 				p = stops[i].GetCoord();
 				for (j = 0, m = stops[i].GetPassengersAmount(); j < m; j++)
-					draw.Circle(p.x, p.y + (j+1) * 20, 5);
+					Draw.Circle(p.x, p.y + (j+1) * 20, 5);
 			}
-			draw.End();
+			Draw.End();
             EndPaint(hWnd, &ps);
         }
         break;

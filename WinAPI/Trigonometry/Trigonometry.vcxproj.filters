@@ -27,13 +27,13 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mini Buses.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\classes\string.h">
+    <ClInclude Include="Trigonometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\classes\winapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\classes\string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\classes\geometry.h">
@@ -44,7 +44,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mini Buses.cpp">
+    <ClCompile Include="Trigonometry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\classes\winapi.cpp">
@@ -58,7 +58,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Mini Buses.rc">
+    <ResourceCompile Include="Trigonometry.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -66,7 +66,7 @@
     <Image Include="small.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Mini Buses.ico">
+    <Image Include="Trigonometry.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
