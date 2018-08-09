@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\classes\geometry.h" />
+    <ClInclude Include="..\..\classes\math.h" />
     <ClInclude Include="..\..\classes\string.h" />
     <ClInclude Include="..\..\classes\winapi.h" />
     <ClInclude Include="Resource.h" />
@@ -155,6 +156,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\classes\geometry.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\classes\math.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\classes\string.cpp">

@@ -2,115 +2,104 @@
 #include "Trigonometry.h"
 
 DRAW Draw;
-Point point;
-int width, height;
+HWND hOption;
+Point oriPoint, sinP, coversinP, excscP, cosP, versinP, exsecP, zeroP, point;
+Line radiusL, tanL;
+int radius, width, height, optionWidth = 300;
+double angle;
 
-void DrawSegment(String word, Point start, Point end, COLORREF color, Point offset = 0, UINT textAlign=TextAlign.Center|TextAlign.Bottom) {
-	start += offset;
-	end += offset;
-	Draw.SetTextAlign(textAlign);
-	Draw.SetColor(color);
-	Draw.Line(start, end);
-	Draw.Text(word, start.MidPointFrom(end));
-}
+const int segmentsSize = 11;
+struct {
+	int buttonId;
+	Segment segment;
+} segments[segmentsSize] = {
+	{ IDC_CHECK_COS,	Segment("cos", zeroP, cosP, radiusL, true, Color.Blue, TextAlign.Center | TextAlign.Bottom) },
+	{ IDC_CHECK_VERSIN, Segment("versin", cosP, versinP, radiusL, true, Color.LightBlue, TextAlign.Center | TextAlign.Bottom) },
+	{ IDC_CHECK_EXSEC,	Segment("exsec", versinP, exsecP, radiusL, true, Color.Aqua, TextAlign.Center | TextAlign.Bottom) },
+	{ IDC_CHECK_SEC,	Segment("sec", zeroP, exsecP, radiusL, true, Color.DarkBlue, TextAlign.Center | TextAlign.Top) },
+	{ IDC_CHECK_SIN,	Segment("sin", zeroP, sinP, radiusL, false, Color.Red, TextAlign.Left) },
+	{ IDC_CHECK_COVERSIN,	Segment("coversin", sinP, coversinP, radiusL, false, Color.Pink, TextAlign.Left) },
+	{ IDC_CHECK_EXCSC,	Segment("excsc", coversinP, excscP, radiusL, false, Color.Violet, TextAlign.Left) },
+	{ IDC_CHECK_COSEC,	Segment("cosec", zeroP, excscP, radiusL, false, Color.DarkRed, TextAlign.Right) },
+	{ IDC_CHECK_TAN,	Segment("tan", point, exsecP, tanL, false, Color.Brown, TextAlign.Left | TextAlign.Bottom) },
+	{ IDC_CHECK_COTAN,	Segment("cotan", point, excscP, tanL, false, Color.Gold, TextAlign.Left | TextAlign.Bottom) },
+	{ IDC_CHECK_CRD,	Segment("crd", point, versinP, radiusL, false, Color.Gray, TextAlign.Right | TextAlign.Top) },
+};
 
-void Drawwing(HWND hWnd) {
-	static double angle;
-	static int radius;
-	static Point start, end, middle, pointOnCircle;
-	static const Point
-		toLeft = Point(-5, 0),
-		toRight = Point(5, 0),
-		toUp = Point(0, 5),
-		toDown = Point(0, -5);
+void DrawOut(HWND hWnd) {
+	static Point pivot, min, max;
+	static int length;
+	pivot.Set(width / 2, height / 2);
 	Draw.Begin(hWnd);
 	Draw.Reset();
-	Draw.SetPivot(Point(width / 2, height / 2), 1);
+	Draw.SetPivot(pivot, 1);
 
-	point = Draw.Map(point);
-	radius = Point(0).DistanceFrom(point);
-	angle = point.AngleFrom(0);
-	pointOnCircle = Circle(0, radius).GetPointAtAngle(angle);
+	if (oriPoint.x < 0) {
+		oriPoint.x *= -1;
+		oriPoint.y *= -1;
+		point = Draw.Map(oriPoint);
+		radius = Point(0).DistanceFrom(point);
+		angle = point.AngleFrom(0);
+	}
+
+	// calculate
+	min = Draw.Map({ 0, height });
+	max = Draw.Map({ width, 0 });
+	length = max(point.DistanceFrom(min), point.DistanceFrom(max)) * (point.x > 0 ? 1 : -1);
+	cosP = Point(point.x, 0);
+	versinP = Point(radius, 0);
+	exsecP = versinP + Point(exsec(angle)*radius, 0);
+	sinP = Point(0, point.y);
+	coversinP = Point(0, radius);
+	excscP = coversinP + Point(0, excsc(angle)*radius);
 	
 	// circle
+	Draw.SetBackgroundColor(Color.Transparent);
 	Draw.Circle(Point(0, 0), radius);
 	// cross
-	Draw.Line(-width / 2, 0, width / 2, 0);
-	Draw.Line(0, -height / 2, 0, height / 2);
-	// point
-	Draw.SetBackgroundColor(Color.Black);
-	Draw.Circle(point, 5);
-	// center to point, infinite
-	end = Circle(0, width / 1.5).GetPointAtAngle(angle);
+	Draw.Line(min.x, 0, max.x, 0);
+	Draw.Line(0, min.y, 0, max.y);
+	// radius
 	Draw.SetLineStyle(LineStyle.Dot);
-	Draw.Line(0, end);
-
-	// setup for lines
-	Draw.SetBackgroundColor(Color.Transparent);
-	Draw.SetLineWidth(3);
-
+	radiusL.Set(zeroP, point);
+	Draw.Line(0, radiusL.GetPointAtDistanceFromPoint(length, Point(0)));
+	// tan
+	tanL.Set(point, exsecP);
+	Draw.Line(tanL.GetPointAtDistanceFromPoint(length, point), tanL.GetPointAtDistanceFromPoint(-length, point));
 	// angle
+	Draw.SetLineWidth(3);
 	Draw.Arc(0, 25, 0, angle);
 	
-	DrawSegment("cos",
-		0,
-		Point(point.x, 0),
-		Color.Blue, 0
-	);
-	DrawSegment("versin",
-		Point(radius, 0),
-		Point(radius - radius * (1 - cos(angle)), 0),
-		Color.LightBlue, toDown * 2
-	);
-	DrawSegment("exsec",
-		Point(radius, 0),
-		Point(radius * (1 / cos(angle)), 0),
-		Color.Aqua, toDown * 4
-	);
-	DrawSegment("sec",
-		0,
-		Point(radius * (1 / cos(angle)), 0),
-		Color.DarkBlue, toDown * 6, TextAlign.Center | TextAlign.Top
-	);
-	
-	DrawSegment(" sin",
-		0,
-		Point(0, point.y),
-		Color.Red, 0, TextAlign.Left
-	);
-	DrawSegment(" coversin",
-		Point(0, radius),
-		Point(0, radius - radius * (1 - sin(angle))),
-		Color.Pink, toLeft * 2, TextAlign.Left
-	);
-	DrawSegment(" excsec",
-		Point(0, radius),
-		Point(0, radius * (1 / sin(angle))),
-		Color.Violet, toLeft * 4, TextAlign.Left
-	);
-	DrawSegment("cosec ",
-		0,
-		Point(0, radius * (1 / sin(angle))),
-		Color.DarkRed, toLeft * 6, TextAlign.Right
-	);
-	
-	DrawSegment(" tan",
-		pointOnCircle,
-		Point(radius * (1 / cos(angle)), 0),
-		Color.Brown, 0, TextAlign.Left | TextAlign.Bottom
-	);
-	DrawSegment(" cotan",
-		pointOnCircle,
-		Point(0, radius * (1 / sin(angle))),
-		Color.Gold, 0, TextAlign.Left | TextAlign.Bottom
-	);
-	DrawSegment("crd ",
-		pointOnCircle,
-		Point(radius, 0),
-		Color.Gray, 0, TextAlign.Right | TextAlign.Top
-	);
+	// draw segments
+	for (int i = 0; i < segmentsSize; i++)
+		if (IsDlgButtonChecked(hOption, segments[i].buttonId) == BST_CHECKED)
+			segments[i].segment.DrawOn(Draw);
+
+	// point
+	Draw.SetBackgroundColor(Color.Black);
+	Draw.SetColor(Color.Black);
+	Draw.SetLineStyle(LineStyle.Solid);
+	Draw.Circle(point, 5);
 
 	Draw.End();
+}
+
+BOOL CALLBACK OptionProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_COMMAND: {
+		switch (HIWORD(wParam)) {
+		case BN_CLICKED:
+			InvalidateRect(GetParent(hWnd), NULL, true);
+			break;
+		default:
+			return 0;
+		}
+	} break;
+	default:
+		return 0;
+	}
+	return 1;
 }
 
 BOOL CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -119,23 +108,30 @@ BOOL CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT: {
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-		Drawwing(hWnd);
+		DrawOut(hWnd);
 		EndPaint(hWnd, &ps);
 	} break;
-	case WM_LBUTTONDOWN:
-		point.x = LOWORD(lParam);
-		point.y = HIWORD(lParam);
+	case WM_LBUTTONUP:
+		oriPoint.x = - (int)LOWORD(lParam);
+		oriPoint.y = - (int)HIWORD(lParam);
 		InvalidateRect(hWnd, NULL, true);
 		break;
 	case WM_SIZE:
-	case WM_INITDIALOG:
+	case WM_INITDIALOG: {
 		RECT rect;
 		GetClientRect(hWnd, &rect);
-		width = rect.right;
+		width = rect.right - optionWidth;
 		height = rect.bottom;
-		point.x = width - 50;
-		point.y = height / 2 - 50;
-		break;
+		if (!hOption)
+			hOption = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_OPTION), hWnd, OptionProc);
+		SetWindowPos(hOption, NULL, rect.right - optionWidth, 0, optionWidth, rect.bottom, SWP_SHOWWINDOW);
+		if (message == WM_SIZE) {
+			InvalidateRect(GetParent(hWnd), NULL, true);
+		} else {
+			oriPoint.x = -width / 4 * 3;
+			oriPoint.y = -height / 4;
+		}
+	} break;
 	case WM_CLOSE:
 		PostQuitMessage(0);
 		break;

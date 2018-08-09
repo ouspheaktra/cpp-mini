@@ -15,6 +15,7 @@ void DRAW::SetPivot(Point point, short positiveQuadrant) {
 	this->positiveQuadrant = positiveQuadrant;
 	pivot = point;
 }
+
 void DRAW::SetColor(COLORREF color) {
 	this->color = color;
 	SelectObject(hdc, CreatePen(lineStyle, lineWidth, color));
@@ -68,7 +69,7 @@ Point DRAW::GetCenter() {
 	RECT rect;
 	GetClientRect(WindowFromDC(hdc), &rect);
 	Point p(rect.right/2, rect.bottom/2);
-	return p;
+	return Convert(p);
 }
 
 int DRAW::GetWidth() {
@@ -81,6 +82,32 @@ int DRAW::GetHeight() {
 	RECT rect;
 	GetClientRect(WindowFromDC(hdc), &rect);
 	return rect.bottom;
+}
+
+Point DRAW::GetMin() {
+	switch (positiveQuadrant) {
+	case 1:
+		return Map({ 0, GetHeight() });
+	case 2:
+		return Map({ GetWidth(), GetHeight() });
+	case 3:
+		return Map({ GetWidth(), 0 });
+	case 4:
+		return Map({ 0, 0 });
+	}
+}
+
+Point DRAW::GetMax() {
+	switch (positiveQuadrant) {
+	case 1:
+		return Map({ GetWidth(), 0 });
+	case 2:
+		return Map({ 0, 0 });
+	case 3:
+		return Map({ 0, GetHeight() });
+	case 4:
+		return Map({ GetWidth(), GetHeight() });
+	}
 }
 
 Point DRAW::Convert(Point point) {

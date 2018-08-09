@@ -114,3 +114,41 @@ Point Point::operator-=(Point point) {
 Point::operator bool() {
 	return !(x == 0 && y == 0);
 }
+
+Line::Line() : Line(0, 0) {}
+
+Line::Line(double slope, double yIntercept) {
+	Set(slope, yIntercept);
+}
+
+Line::Line(Point point1, Point point2) {
+	Set(point1, point2);
+}
+
+void Line::Set(double slope, double yIntercept) {
+	this->slope = slope;
+	this->yIntercept = yIntercept;
+}
+
+void Line::Set(Point point1, Point point2) {
+	slope = ((double)point2.y - (double)point1.y) / ((double)point2.x - (double)point1.x);
+	yIntercept = point1.y - slope * point1.x;
+}
+
+Point Line::GetPointAtX(int x) {
+	return {
+		x,
+		(int)(x * slope + yIntercept)
+	};
+}
+
+Point Line::GetPointAtY(int y) {
+	return {
+		(int)((y - yIntercept) / slope),
+		y
+	};
+}
+
+Point Line::GetPointAtDistanceFromPoint(double distance, Point point) {
+	return GetPointAtX(point.x + distance / sqrt(1 + slope * slope));
+}

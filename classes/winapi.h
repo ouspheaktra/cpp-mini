@@ -1,3 +1,8 @@
+/***
+- Draw.SetArea() set drawwing area
+- Implement Draw using double buffering, Draw.Begin() start buffer, Draw.End() finish buffer and put it into the real hdc
+***/
+
 #ifndef WINAPI_H
 #define WINAPI_H
 
@@ -68,11 +73,12 @@ class DRAW {
 	int lineWidth;
 	int lineStyle;
 	Point pivot;
-	
 public:
 	short positiveQuadrant;
 	DRAW();
 	void SetPivot(Point point, short positiveQuadrant=4);
+	void SetArea(Point start, Point end);
+
 	void SetColor(COLORREF color);
 	void SetBackgroundColor(COLORREF color);
 	void SetLineWidth(int lineWidth);
@@ -89,6 +95,8 @@ public:
 	Point GetCenter();
 	int GetWidth();
 	int GetHeight();
+	Point GetMin();
+	Point GetMax();
 	Point Convert(Point point);
 	Point Map(Point point);
 	

@@ -19,6 +19,6 @@
 
 
 // TODO: reference additional headers your program requires here
-#include <cmath>
 #include "resource.h"
+#include "../../classes/math.h"
 #include "../../classes/winapi.h"

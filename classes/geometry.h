@@ -40,4 +40,18 @@ public:
 	Point GetPointAtAngle(double angle);
 };
 
+class Line {
+	double slope;
+	double yIntercept;
+public:
+	Line();
+	Line(double slope, double yIntercept);
+	Line(Point point1, Point point2);
+	void Set(double slope, double yIntercept);
+	void Set(Point point1, Point point2);
+	Point GetPointAtX(int x);
+	Point GetPointAtY(int y);
+	Point GetPointAtDistanceFromPoint(double distance, Point point);
+};
+
 #endif
