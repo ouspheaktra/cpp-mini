@@ -119,7 +119,7 @@ const TCHAR * String::ToTCHAR() {
 const char * String::ToChar() {
 	if (sizeof(TCHAR) == sizeof(char))
 		return (char *)value;
-	char *out = new char[Length() + 1];
+	char * out = new char[Length() + 1];
 	wcstombs(out, value, Length() + 1);
 	return out;
 }
@@ -134,7 +134,7 @@ int String::Find(const String & str) {
 		return (found - value);
 	return -1;
 }
-int String::Length() {
+const int String::Length() const {
 	return _tcslen(value);
 }
 String String::SubString(int start, int length) {
@@ -142,7 +142,9 @@ String String::SubString(int start, int length) {
 	for (int i = 0; i < length; i++)
 		str[i] = value[start+i];
 	str[length] = '\0';
-	return String(str);
+	String out(str);
+	delete[] str;
+	return out;
 }
 /*
 String::operator char*() {
@@ -174,7 +176,9 @@ String String::operator+ (const String &str) {
 	TCHAR *newstr = new TCHAR[_tcslen(str.value) + _tcslen(value) + 1];
 	_tcscpy(newstr, value);
 	_tcscat(newstr, str.value);
-	return String(newstr);
+	String out(newstr);
+	delete[] newstr;
+	return out;
 }
 String String::operator+= (const String &str) {
 	*this = *this + str;
