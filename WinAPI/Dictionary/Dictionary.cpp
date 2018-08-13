@@ -7,7 +7,7 @@ HINSTANCE hIns;
 Dict dict;
 HWND hList;
 
-BOOL CALLBACK AddEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK AddEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_COMMAND: {
 
@@ -46,7 +46,7 @@ BOOL CALLBACK AddEditProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return true;
 }
 
-BOOL CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_COMMAND: {
 		switch (LOWORD(wParam)) {

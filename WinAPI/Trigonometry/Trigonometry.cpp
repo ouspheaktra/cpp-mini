@@ -45,7 +45,7 @@ void DrawOut(HWND hWnd) {
 	if (reCalculate) {
 		if (!calcByAngle) {
 			point = Draw.Map(oriPoint);
-			radius = Point(0).DistanceFrom(point);
+			radius = (int)Point(0).DistanceFrom(point);
 			angle = point.AngleFrom(0);
 		} else
 			point = Circle(Point(0), radius).GetPointAtAngle(angle);
@@ -53,7 +53,7 @@ void DrawOut(HWND hWnd) {
 		// calculate
 		min = Draw.Map({ 0, height });
 		max = Draw.Map({ width, 0 });
-		length = max(point.DistanceFrom(min), point.DistanceFrom(max)) * (point.x > 0 ? 1 : -1);
+		length = (int)max(point.DistanceFrom(min), point.DistanceFrom(max)) * (point.x > 0 ? 1 : -1);
 		cosP = Point(point.x, 0);
 		versinP = Point(radius, 0);
 		exsecP = versinP + Point(exsec(angle)*radius, 0);
@@ -181,9 +181,9 @@ INT_PTR CALLBACK OptionProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		}
 	} break;
 	case WM_INITDIALOG: {
-		oldEditProc = (WNDPROC)SetWindowLong(GetDlgItem(hWnd, IDC_EDIT_ANGLE), GWL_WNDPROC, (LONG)EditNumberProc);
+		oldEditProc = (WNDPROC)SetWindowLong(GetDlgItem(hWnd, IDC_EDIT_ANGLE), GWLP_WNDPROC, (LONG)EditNumberProc);
 		for (int i = 0; i < segmentsSize; i++)
-			SetWindowLong(GetDlgItem(hWnd, segments[i].editId), GWL_WNDPROC, (LONG)EditNumberProc);
+			SetWindowLong(GetDlgItem(hWnd, segments[i].editId), GWLP_WNDPROC, (LONG)EditNumberProc);
 	} break;
 	default:
 		return 0;

@@ -27,7 +27,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	// TODO: Place code here.
-	srand(time(NULL));
+	srand((unsigned int)time(NULL));
 
 	// Initialize global strings
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -187,14 +187,14 @@ public:
 			_spinId -= size;
 		if (_spinId < 0.5)
 			_spinId += size;
-		BitBlt(hdc, x, y, 200, 400, this->GetHDC(), 0, 200 * _spinId - 100, SRCCOPY);
+		BitBlt(hdc, x, y, 200, 400, this->GetHDC(), 0, 200 * (int)_spinId - 100, SRCCOPY);
 	}
 
 	void PreSpin() {
 		spinId = id;
 		id = (int)random(0, (float)size - 0.1);
 		spinSpeed = random(0.25, 0.75);
-		spinTo = spinId + (int)random(2, 4)*(size);
+		spinTo = (int)spinId + (int)random(2, 4)*(size);
 		spinning = true;
 	}
 	void Spin(HDC hdc, int x, int y) {

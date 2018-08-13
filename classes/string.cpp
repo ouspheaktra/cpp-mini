@@ -46,7 +46,7 @@ void String::SetValue(const TCHAR *s) {
 }
 #ifdef _UNICODE
 void String::SetValue(const char *s) {
-	int len = strlen(s) + 1;
+	int len = (int)strlen(s) + 1;
 	TCHAR *t = new TCHAR[len];
 	for (int i = 0; i < len; i++)
 		t[i] = s[i];
