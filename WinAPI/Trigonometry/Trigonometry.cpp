@@ -84,7 +84,7 @@ void DrawOut(HWND hWnd) {
 	Draw.End();
 }
 
-BOOL CALLBACK OptionProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OptionProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
 	case WM_COMMAND: {
@@ -102,7 +102,7 @@ BOOL CALLBACK OptionProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 1;
 }
 
-BOOL CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
 	case WM_PAINT: {
