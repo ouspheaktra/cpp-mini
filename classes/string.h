@@ -38,6 +38,7 @@ public:
 #else
 	const char * ToChar();
 #endif
+	int Find(const String &str);
 	int Length();
 	String SubString(int start, int length);
 	

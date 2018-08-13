@@ -2,44 +2,86 @@
 
 #include "resource.h"
 
+class SEGMENTPOS {
+public:
+	static const int
+		X = 1,
+		Y = 0,
+		In = 2,
+		Out = 0;
+};
+#define XIn		SEGMENTPOS::X | SEGMENTPOS::In
+#define XOut	SEGMENTPOS::X | SEGMENTPOS::Out
+#define	YIn		SEGMENTPOS::Y | SEGMENTPOS::In
+#define YOut	SEGMENTPOS::Y | SEGMENTPOS::Out
+
 class Segment {
 public:
-	Point &start, &end;
+	Point &start, &end, &point;
 	String word;
 	Line &line;
-	bool traceToX;
+	int pos;
 	COLORREF color;
-	Point offset = 0;
-	UINT textAlign;
-	Segment(String word, Point &start, Point &end, Line &line, bool traceToX, COLORREF color, UINT textAlign) :
+	int offset;
+	UINT ta;
+	DRAW &Draw;
+	Segment(String word, Point &start, Point &end, Line &line, int offset, int pos, COLORREF color, Point &point, DRAW &draw) :
 		start(start),
 		end(end),
 		word(word),
 		line(line),
-		traceToX(traceToX),
+		pos(pos),
 		color(color),
-		offset(Point(0,0)),
-		textAlign(textAlign)
+		offset(offset),
+		point(point),
+		Draw(draw)
 	{ }
-	void DrawOn(DRAW &Draw) {
-		start += offset;
-		end += offset;
+	void DrawOut() {
+		Point startP = start;
+		Point endP = end;
+		bool isX = pos & SEGMENTPOS::X;
+		bool isIn = pos & SEGMENTPOS::In;
+		UINT textAlign = TextAlign.Right;
+		String string = word;
 		Draw.SetLineStyle(LineStyle.Solid);
 		Draw.SetLineWidth(3);
+		if (isX) {
+			Point offsetP = Point(0, 15 * offset);
+			textAlign = TextAlign.Center;
+			if (point.y >= 0) {
+				offsetP.y *= -1;
+				textAlign |= (isIn ? TextAlign.Bottom : TextAlign.Top);
+			} else {
+				textAlign |= (isIn ? TextAlign.Top : TextAlign.Bottom);
+			}
+			startP += offsetP;
+			endP += offsetP;
+		} else {
+			Point offsetP = Point(15 * offset, 0);
+			if (point.x >= 0) {
+				offsetP.x *= -1;
+				textAlign = (isIn ? TextAlign.Left : TextAlign.Right);
+				string = (isIn ? String(" ") + string : string + String(" "));
+			} else {
+				textAlign = (isIn ? TextAlign.Right : TextAlign.Left);
+				string = (isIn ? string + String(" ") : String(" ") + string);
+			}
+			startP += offsetP;
+			endP += offsetP;
+		}
 		Draw.SetTextAlign(textAlign);
 		Draw.SetColor(color);
-		Draw.Line(start, end);
-		Draw.Text(word, start.MidPointFrom(end));
+		Draw.Line(startP, endP);
+		Draw.Text(string, startP.MidPointFrom(endP));
 
 		Draw.SetLineStyle(LineStyle.Dot);
 		Draw.SetLineWidth(1);
-		if (traceToX) {
-			Draw.Line(start, line.GetPointAtX(start.x));
-			Draw.Line(end, line.GetPointAtX(end.x));
-		}
-		else {
-			Draw.Line(start, line.GetPointAtY(start.y));
-			Draw.Line(end, line.GetPointAtY(end.y));
+		if (isX) {
+			Draw.Line(startP, line.GetPointAtX(startP.x));
+			Draw.Line(endP, line.GetPointAtX(endP.x));
+		} else {
+			Draw.Line(startP, line.GetPointAtY(startP.y));
+			Draw.Line(endP, line.GetPointAtY(endP.y));
 		}
 	}
 };

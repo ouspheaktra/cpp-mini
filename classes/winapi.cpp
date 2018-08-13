@@ -92,7 +92,7 @@ Point DRAW::GetMin() {
 		return Map({ GetWidth(), GetHeight() });
 	case 3:
 		return Map({ GetWidth(), 0 });
-	case 4:
+	default:
 		return Map({ 0, 0 });
 	}
 }
@@ -105,7 +105,7 @@ Point DRAW::GetMax() {
 		return Map({ 0, 0 });
 	case 3:
 		return Map({ 0, GetHeight() });
-	case 4:
+	default:
 		return Map({ GetWidth(), GetHeight() });
 	}
 }
@@ -196,8 +196,8 @@ void DRAW::Rectangle(int x, int y, int width, int height, double angle) {
 }
 void DRAW::Rectangle(Point point, int width, int height, double angle) {
 	point = Convert(point);
-	double w = (width / 2) * cos(angle) - (height / 2) * sin(angle);
-	double h = (height / 2) * cos(angle) + (width / 2) * sin(angle);
+	int w = (int)((width / 2) * cos(angle) - (height / 2) * sin(angle));
+	int h = (int)((height / 2) * cos(angle) + (width / 2) * sin(angle));
 	POINT p[4];
 	p[0].x = point.x + w;
 	p[0].y = point.y + h;

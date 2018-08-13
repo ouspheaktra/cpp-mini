@@ -63,7 +63,8 @@ public:
 	static const UINT
 		Solid = PS_SOLID,
 		Dash = PS_DASH,
-		Dot = PS_DOT;
+		Dot = PS_DOT,
+		DotDash = PS_DASHDOT;
 };
 extern LINESTYLE LineStyle;
 
