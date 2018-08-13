@@ -2,11 +2,7 @@
 #define GEOMETRY_H
 
 #include <windows.h>
-#include <math.h>
-
-#define PI 3.14159265358979323846
-#define toRadian(degree) (double)(degree*PI / 180)
-#define toDegree(radian) (float)(radian*180 / PI)
+#include "math.h"
 
 class Point {
 public:
@@ -24,7 +20,6 @@ public:
 
 	Point operator + (Point point) const;
 	Point operator - (Point point) const;
-	Point operator * (int number) const;
 	Point operator += (Point point);
 	Point operator -= (Point point);
 	operator bool();

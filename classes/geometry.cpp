@@ -94,13 +94,6 @@ Point Point::operator-(Point point) const {
 	};
 }
 
-Point Point::operator* (int number) const {
-	return {
-		this->x * number,
-		this->y * number
-	};
-}
-
 Point Point::operator+=(Point point) {
 	*this = *this + point;
 	return *this;

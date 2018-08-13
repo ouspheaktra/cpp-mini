@@ -72,13 +72,24 @@ void String::SetValue(const TCHAR *format, ...) {
 }
 */
 void String::SetValue(double num) {
-	TCHAR tmp[20] = {'\0'};
-	_stprintf(tmp, _TEXT("%f"), num);
-	SetValue(tmp);
+	if (isfinite(num)) {
+		TCHAR tmp[20] = { '\0' };
+		_sntprintf(tmp, 20, _TEXT("%.2f"), num);
+		SetValue(tmp);
+	} else {
+		if (isnan(num))
+			SetValue("NAN");
+		else {
+			if (num == INFINITY)
+				SetValue("INFINITY");
+			else
+				SetValue("-INFINITY");
+		}
+	}
 }
 void String::SetValue(int num) {
 	TCHAR tmp[20] = {'\0'};
-	_stprintf(tmp, _TEXT("%d"), num);
+	_sntprintf(tmp, 20, _TEXT("%d"), num);
 	SetValue(tmp);
 }
 void String::Empty() {
@@ -117,6 +128,12 @@ const char * String::ToChar() {
 	return value;
 }
 #endif
+int String::Find(const String & str) {
+	TCHAR * found = _tcsstr(value, str.value);
+	if (found)
+		return (found - value);
+	return -1;
+}
 int String::Length() {
 	return _tcslen(value);
 }
