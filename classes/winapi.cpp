@@ -18,6 +18,7 @@ void DRAW::SetPivot(Point point, short positiveQuadrant) {
 
 void DRAW::SetColor(COLORREF color) {
 	this->color = color;
+	DeleteObject(GetCurrentObject(hdc, OBJ_PEN));
 	SelectObject(hdc, CreatePen(lineStyle, lineWidth, color));
 	SetTextColor(hdc, color);
 }
@@ -28,16 +29,19 @@ void DRAW::SetBackgroundColor(COLORREF color) {
 		SelectObject(hdc, GetStockObject(NULL_BRUSH));
 	} else {
 		SetBkMode(hdc, OPAQUE);
+		DeleteObject(GetCurrentObject(hdc, OBJ_BRUSH));
 		SelectObject(hdc, CreateSolidBrush(color));
 	}
 }
 void DRAW::SetLineWidth(int lineWidth) {
 	this->lineWidth = lineWidth;
+	DeleteObject(GetCurrentObject(hdc, OBJ_PEN));
 	SelectObject(hdc, CreatePen(lineStyle, lineWidth, color));
 }
 
 void DRAW::SetLineStyle(int lineStyle) {
 	this->lineStyle = lineStyle;
+	DeleteObject(GetCurrentObject(hdc, OBJ_PEN));
 	SelectObject(hdc, CreatePen(lineStyle, lineWidth, color));
 }
 
