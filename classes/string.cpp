@@ -1,26 +1,27 @@
 #include "string.h"
 
 void S::Null() {
-	if (ch)
-		delete[] ch;
-	ch = NULL;
-	if (wch)
-		delete[] wch;
-	wch = NULL;
+	if (value)
+		delete[] value;
+	value = NULL;
 }
 
 /* CONSTRUCTOR */
 S::S() {
-	Empty();
+	Set(NULL);
 }
-S::S(const wchar_t *s) {
+S::S(const TCHAR *s) {
 	Set(s);
 }
-S::S(const wchar_t c) {
+S::S(const TCHAR c) {
 	Set(c);
 }
-S::S(const char *s) {
+S::S(const char * s) {
 	Set(s);
+}
+S::S(const char c) {
+	char str[2] = { c, 0 };
+	Set(str);
 }
 S::S(double number) {
 	Set(number);
@@ -39,45 +40,28 @@ S::~S() {
 }
 
 void S::Set(const S & s) {
-	if (isWch) {
-		wchar_t * str = s.ToWChar();
-		Set(str);
-		delete[] str;
-	} else {
-		char * str = s.ToChar();
-		Set(str);
-		delete[] str;
-	}
+	Set(s.GetValue());
 }
 
 /* METHOD */
-void S::Set(const wchar_t *s) {
-	isWch = true;
+void S::Set(const TCHAR *s) {
 	Null();
 	if (s) {
-		wch = new wchar_t[wcslen(s) + 1];
-		wcscpy(wch, s);
+		value = new TCHAR[_tcslen(s) + 1];
+		_tcscpy(value, s);
 	} else
 		Empty();
 }
-void S::Set(const wchar_t c) {
-	wchar_t n[2] = { c, 0 };
+void S::Set(const TCHAR c) {
+	TCHAR n[2] = { c, 0 };
 	Set(n);
 }
 
-void S::Set(const char *s) {
-	isWch = false;
-	Null();
-	if (s) {
-		ch = new char[strlen(s) + 1];
-		strcpy(ch, s);
-	} else
-		Empty();
-}
-
-void S::Set(const char c) {
-	char n[2] = { c, 0 };
-	Set(n);
+void S::Set(const char * s) {
+	TCHAR * str = new TCHAR[strlen(s) + 1];
+	mbstowcs(str, s, strlen(s) + 1);
+	Set(str);
+	delete[] str;
 }
 
 /*
@@ -100,161 +84,103 @@ void S::Set(const TCHAR *format, ...) {
 
 void S::Set(double num, int decimalPoint) {
 	if (isfinite(num)) {
-		char format[10] = { 0 };
-		snprintf(format, 10, "%%.%df", decimalPoint);
-		char tmp[20] = { 0 };
-		snprintf(tmp, 20, format, num);
+		TCHAR format[10] = { 0 };
+		_sntprintf(format, 10, _TEXT("%%.%df"), decimalPoint);
+		TCHAR tmp[20] = { 0 };
+		_sntprintf(tmp, 20, format, num);
 		Set(tmp);
 	} else {
 		if (isnan(num))
-			Set("NAN");
+			Set(_TEXT("NAN"));
 		else {
 			if (num == INFINITY)
-				Set("INFINITY");
+				Set(_TEXT("INFINITY"));
 			else
-				Set("-INFINITY");
+				Set(_TEXT("-INFINITY"));
 		}
 	}
 }
 void S::Set(int num) {
-	char tmp[20] = { 0 };
-	snprintf(tmp, 20, "%d", num);
+	TCHAR tmp[20] = { 0 };
+	_sntprintf(tmp, 20, _TEXT("%d"), num);
 	Set(tmp);
 }
 void S::Empty() {
 	Null();
-	if (isWch) {
-		wch = new wchar_t[1];
-		wch[0] = 0;
-	} else {
-		ch = new char[1];
-		ch[0] = 0;
-	}
+	value = new TCHAR[1];
+	value[0] = 0;
 }
 int S::ToInt() const {
-	return (isWch ? _wtoi(wch) : atoi(ch));
+	return _ttoi(value);
 }
 double S::ToDouble() const {
-	return (isWch ? _wtof(wch) : atof(ch));
+	return _ttof(value);
 }
-wchar_t * S::ToWChar() const {
-	wchar_t * out = new wchar_t[Length() + 1];
-	if (isWch)
-		wcscpy(out, wch);
-	else
-		mbstowcs(out, ch, Length() + 1);
-	return out;
+const TCHAR * S::GetValue() const {
+	return value;
 }
-char * S::ToChar() const {
+
+const char * S::ToChar() const {
 	char * out = new char[Length() + 1];
-	if (!isWch)
-		strcpy(out, ch);
-	else
-		wcstombs(out, wch, Length() + 1);
+	wcstombs(out, value, Length() + 1);
 	return out;
 }
+
 int S::IndexOf(const S & str) const {
 	int id = -1;
-	if (!isWch) {
-		char * word = str.ToChar();
-		char * found = strstr(ch, word);
-		if (found)
-			id = found - ch;
-		delete[] word;
-	} else {
-		wchar_t * word = str.ToWChar();
-		wchar_t * found = wcsstr(wch, word);
-		if (found)
-			id = found - wch;
-		delete[] word;
-	}
+	TCHAR * found = wcsstr(value, str.value);
+	if (found)
+		id = found - value;
 	return id;
 }
 int S::Count(const S & str) const {
 	int count = 0;
 	int id = IndexOf(str);
 	if (id >= 0)
-		if (!isWch)
-			return 1 + S(ch + id + str.Length()).Count(str);
-		else
-			return 1 + S(wch + id + str.Length()).Count(str);
+		return 1 + S(value + id + str.Length()).Count(str);
 	return count;
 }
 int S::Length() const {
-	if (isWch)
-		return wcslen(wch);
-	else
-		return strlen(ch);
+	return _tcslen(value);
 }
 S S::SubString(int start, int length) const {
-	if (isWch) {
-		wchar_t *str = new wchar_t[length + 1];
-		wcsncpy(str, wch + start, length);
-		str[length] = 0;
-		S out(str);
-		delete[] str;
-		return out;
-	} else {
-		char *str = new char[length + 1];
-		strncpy(str, ch + start, length);
-		str[length] = 0;
-		S out(str);
-		delete[] str;
-		return out;
-	}
+	TCHAR *str = new TCHAR[length + 1];
+	_tcsncpy(str, value + start, length);
+	str[length] = 0;
+	S out(str);
+	delete[] str;
+	return out;
 }
 
 /* OPERATOR */
-S::operator wchar_t * () const {
-	return ToWChar();
+S::operator const TCHAR * () const {
+	return GetValue();
 }
-S::operator char*() const {
+S::operator const char*() const {
 	return ToChar();
 }
 S::operator bool() const {
 	return Length();
 }
-wchar_t S::operator[](const int i) const {
-	return (isWch ? wch[i] : ch[i]);
+TCHAR S::operator[](const int i) const {
+	return value[i];
 }
 void S::operator= (const S &str) {
 	Set(str);
 }
 bool S::operator== (const S &str) const {
-	if (isWch) {
-		wchar_t *otherStr = str.ToWChar();
-		bool out = (wcscmp(wch, otherStr) == 0);
-		delete[] otherStr;
-		return out;
-	} else {
-		char *otherStr = str.ToChar();
-		bool out = (strcmp(ch, otherStr) == 0);
-		delete[] otherStr;
-		return out;
-	}
+	return (_tcscmp(value, str.value) == 0);
 }
 bool S::operator!=(const S & str) const {
 	return !(*this == str);
 }
 
 S & S::operator+ (const S &str) {
-	if (isWch) {
-		wchar_t *newStr = new wchar_t[str.Length() + Length() + 1];
-		wchar_t *otherStr = str.ToWChar();
-		wcscpy(newStr, wch);
-		wcscat(newStr, otherStr);
-		Set(newStr);
-		delete[] newStr;
-		delete[] otherStr;
-	} else {
-		char *newStr = new char[str.Length() + Length() + 1];
-		char *otherStr = str.ToChar();
-		strcpy(newStr, ch);
-		strcat(newStr, otherStr);
-		Set(newStr);
-		delete[] newStr;
-		delete[] otherStr;
-	}
+	TCHAR *newStr = new TCHAR[str.Length() + Length() + 1];
+	_tcscpy(newStr, value);
+	_tcscat(newStr, str.value);
+	Set(newStr);
+	delete[] newStr;
 	return *this;
 }
 S & S::operator+= (const S &str) {
