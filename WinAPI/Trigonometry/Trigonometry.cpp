@@ -117,15 +117,14 @@ BOOL CALLBACK EditNumberProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		first[LOWORD(pos)] = 0;
 		String newText = String(first) + String(key) + String(tmp + HIWORD(pos));
 		SetWindowText(GetParent(GetParent(hWnd)), String(newText.Count("-")));
-		if ((newText.Length() <= maxChar) &&
+		if (key == VK_BACK || ((newText.Length() <= maxChar) &&
 			(
 				(key >= '0' && key <= '9') || 
 				(key == '.' && (newText.Count(".") <= 1)) ||
 				((key == '-') && (newText.Count("-") <= 1) && (newText[0] == L'-')) ||
-				((key == '+') && (newText.Count("+") <= 1) && (newText[0] == L'+')) ||
-				key == VK_BACK
+				((key == '+') && (newText.Count("+") <= 1) && (newText[0] == L'+'))
 			)
-		)
+		))
 			return CallWindowProc(oldEditProc, hWnd, message, wParam, lParam);
 	} break;
 	case WM_KEYUP: {
@@ -174,6 +173,7 @@ INT_PTR CALLBACK OptionProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 			reCalculate = true;
 			calcByAngle = true;
 			InvalidateRect(hPaint, NULL, true);
+			SetFocus(hPaint);
 		}	break;
 		default:
 			return 0;

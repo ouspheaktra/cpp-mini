@@ -1,8 +1,3 @@
-/***
-- Draw.SetArea() set drawwing area
-- Implement Draw using double buffering, Draw.Begin() start buffer, Draw.End() finish buffer and put it into the real hdc
-***/
-
 #ifndef WINAPI_H
 #define WINAPI_H
 
@@ -78,7 +73,9 @@ public:
 	short positiveQuadrant;
 	DRAW();
 	void SetPivot(Point point, short positiveQuadrant=4);
-	void SetArea(Point start, Point end);
+
+	// draw on specific area
+	//void SetArea(Point start, Point end);
 
 	void SetColor(COLORREF color);
 	void SetBackgroundColor(COLORREF color);
