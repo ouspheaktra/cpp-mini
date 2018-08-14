@@ -1,61 +1,65 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include <tchar.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <wchar.h>
+#include <string.h>
+#include <math.h>
 
-class String {
-	TCHAR *value = NULL;
+class S {
+	char *ch = NULL;
+	wchar_t *wch = NULL;
+	bool isWch = false;
+	void Null();
 public:
 	/* CONSTRUCTOR */
-	String();
-#ifdef _UNICODE
-	String(const char *s);
-#endif
-	String(const TCHAR *s);
-	String(const TCHAR c);
-	String(double number);
-	String(int number);
+	S();
+	S(const char *s);
+	S(const wchar_t *s);
+	S(const char c);
+	S(const wchar_t c);
+	S(double number);
+	S(int number);
 	// Copy
-	String(const String &s);
+	S(const S &s);
 	
 	/* DESTRUCTOR */
-	~String();
+	~S();
 	
 	/* METHOD */
-	void Set(const TCHAR *s);
-	void Set(const TCHAR c);
-#ifdef _UNICODE
+	void Set(const S &s);
+	void Set(const wchar_t *s);
+	void Set(const wchar_t c);
 	void Set(const char *s);
-#endif
-	void Set(double num);
+	void Set(const char c);
+	void Set(double num, int decimalPoint=2);
 	void Set(int num);
 	void Empty();
-	int ToInt();
-	double ToDouble();
-	void Cin();
-	const TCHAR * GetValue();
-#ifdef _UNICODE
-	const TCHAR * ToTCHAR();
-	const char * ToChar();
-#else
-	const char * ToChar();
-#endif
-	int IndexOf(const String &str) const;
-	int Count(const String &str) const;
-	const int Length() const;
-	String SubString(int start, int length);
+
+	int ToInt() const;
+	double ToDouble() const;
+	wchar_t * ToWChar() const;
+	char * ToChar() const;
+
+	int IndexOf(const S &str) const;
+	int Count(const S &str) const;
+	int Length() const;
+
+	S SubString(int start, int length) const;
 	
 	/* OPERATOR */
-	operator TCHAR* ();
-	operator bool();
-	TCHAR operator[] (const int i);
-	void operator= (const String &str);
-	bool operator== (const String &str);
-	bool operator!= (const String &str);
-	String operator+ (const String &str);
-	String operator- (const String &str);
-	String operator* (const String &str);
-	String operator/ (const String &str);
-	String operator+= (const String &str);
+	operator char * () const;
+	operator wchar_t * () const;
+	operator bool() const;
+	wchar_t operator[] (const int i) const;
+	void operator= (const S &str);
+	bool operator== (const S &str) const;
+	bool operator!= (const S &str) const;
+	S & operator+ (const S &str);
+	S & operator+= (const S &str);
 };
+
+typedef S String;
+
 #endif

@@ -1,68 +1,87 @@
-#include <stdlib.h>
-#include <iostream>
-#include <tchar.h>
-#include <stdarg.h>
 #include "string.h"
 
+void S::Null() {
+	if (ch)
+		delete[] ch;
+	ch = NULL;
+	if (wch)
+		delete[] wch;
+	wch = NULL;
+}
+
 /* CONSTRUCTOR */
-String::String() {
+S::S() {
 	Empty();
 }
-String::String(const TCHAR *s) {
+S::S(const wchar_t *s) {
 	Set(s);
 }
-String::String(const TCHAR c) {
+S::S(const wchar_t c) {
 	Set(c);
 }
-#ifdef _UNICODE
-String::String(const char *s) {
+S::S(const char *s) {
 	Set(s);
 }
-#endif
-String::String(double number) {
+S::S(double number) {
 	Set(number);
 }
-String::String(int number) {
+S::S(int number) {
 	Set(number);
 }
 // Copy
-String::String(const String &s) {
-	Set(s.value);
+S::S(const S &s) {
+	Set(s);
 }
 
 /* DESTRUCTOR */
-String::~String() {
-	if (value)
-		delete[] value;
+S::~S() {
+	Null();
+}
+
+void S::Set(const S & s) {
+	if (isWch) {
+		wchar_t * str = s.ToWChar();
+		Set(str);
+		delete[] str;
+	} else {
+		char * str = s.ToChar();
+		Set(str);
+		delete[] str;
+	}
 }
 
 /* METHOD */
-void String::Set(const TCHAR *s) {
-	if (value)
-		delete [] value;
+void S::Set(const wchar_t *s) {
+	isWch = true;
+	Null();
 	if (s) {
-		value = new TCHAR[_tcslen(s) + 1];
-		_tcscpy(value, s);
-	}
-	else
+		wch = new wchar_t[wcslen(s) + 1];
+		wcscpy(wch, s);
+	} else
 		Empty();
 }
-void String::Set(const TCHAR c) {
-	TCHAR n[2] = { c, 0 };
+void S::Set(const wchar_t c) {
+	wchar_t n[2] = { c, 0 };
 	Set(n);
 }
-#ifdef _UNICODE
-void String::Set(const char *s) {
-	int len = (int)strlen(s) + 1;
-	TCHAR *t = new TCHAR[len];
-	for (int i = 0; i < len; i++)
-		t[i] = s[i];
-	Set(t);
-	delete[] t;
+
+void S::Set(const char *s) {
+	isWch = false;
+	Null();
+	if (s) {
+		ch = new char[strlen(s) + 1];
+		strcpy(ch, s);
+	} else
+		Empty();
 }
-#endif
+
+void S::Set(const char c) {
+	char n[2] = { c, 0 };
+	Set(n);
+}
+
 /*
-void String::Set(const TCHAR *format, ...) {
+void S::Set(const TCHAR *format, ...) {
 	va_list list;
 	va_start(list, format);
 	for (int i = 0, n = strlen(format); i < n; i++) {
@@ -78,10 +97,13 @@ void String::Set(const TCHAR *format, ...) {
 	va_end(list);
 }
 */
-void String::Set(double num) {
+
+void S::Set(double num, int decimalPoint) {
 	if (isfinite(num)) {
-		TCHAR tmp[20] = { '\0' };
-		_sntprintf(tmp, 20, _TEXT("%.2f"), num);
+		char format[10] = { 0 };
+		snprintf(format, 10, "%%.%df", decimalPoint);
+		char tmp[20] = { 0 };
+		snprintf(tmp, 20, format, num);
 		Set(tmp);
 	} else {
 		if (isnan(num))
@@ -94,151 +116,148 @@ void String::Set(double num) {
 		}
 	}
 }
-void String::Set(int num) {
-	TCHAR tmp[20] = {'\0'};
-	_sntprintf(tmp, 20, _TEXT("%d"), num);
+void S::Set(int num) {
+	char tmp[20] = { 0 };
+	snprintf(tmp, 20, "%d", num);
 	Set(tmp);
 }
-void String::Empty() {
-	if (value != NULL)
-		delete [] value;
-	value = new TCHAR[1];
-	value[0] = '\0';
+void S::Empty() {
+	Null();
+	if (isWch) {
+		wch = new wchar_t[1];
+		wch[0] = 0;
+	} else {
+		ch = new char[1];
+		ch[0] = 0;
+	}
 }
-int String::ToInt() {
-	return _ttoi(value);
+int S::ToInt() const {
+	return (isWch ? _wtoi(wch) : atoi(ch));
 }
-double String::ToDouble() {
-	return _tstof(value);
+double S::ToDouble() const {
+	return (isWch ? _wtof(wch) : atof(ch));
 }
-void String::Cin() {
-	char s[256];
-	std::cin.getline(s, 256);
-	Set(s);
-}
-const TCHAR * String::GetValue() {
-	return value;
-}
-#ifdef _UNICODE
-const TCHAR * String::ToTCHAR() {
-	return value;
-}
-const char * String::ToChar() {
-	if (sizeof(TCHAR) == sizeof(char))
-		return (char *)value;
-	char * out = new char[Length() + 1];
-	wcstombs(out, value, Length() + 1);
-	return out;
-}
-#else
-const char * String::ToChar() {
-	return value;
-}
-#endif
-int String::IndexOf(const String & str) const {
-	TCHAR * found = _tcsstr(value, str.value);
-	if (found)
-		return (found - value);
-	return -1;
-}
-int String::Count(const String & str) const {
-	int id = IndexOf(str);
-	if (id < 0)
-		return 0;
+wchar_t * S::ToWChar() const {
+	wchar_t * out = new wchar_t[Length() + 1];
+	if (isWch)
+		wcscpy(out, wch);
 	else
-		return 1 + String(value + id + str.Length()).Count(str);
-}
-const int String::Length() const {
-	return _tcslen(value);
-}
-String String::SubString(int start, int length) {
-	TCHAR *str = new TCHAR[length + 1];
-	for (int i = 0; i < length; i++)
-		str[i] = value[start+i];
-	str[length] = '\0';
-	String out(str);
-	delete[] str;
+		mbstowcs(out, ch, Length() + 1);
 	return out;
 }
-/*
-String::operator char*() {
-	char *out = new char[Length() + 1];
-	for (int i = 0, n = Length() + 1; i < n; i++)
-		out[i] = value[i];
+char * S::ToChar() const {
+	char * out = new char[Length() + 1];
+	if (!isWch)
+		strcpy(out, ch);
+	else
+		wcstombs(out, wch, Length() + 1);
 	return out;
 }
-*/
-/* OPERATOR */
-String::operator TCHAR* () {
-	return value;
+int S::IndexOf(const S & str) const {
+	int id = -1;
+	if (!isWch) {
+		char * word = str.ToChar();
+		char * found = strstr(ch, word);
+		if (found)
+			id = found - ch;
+		delete[] word;
+	} else {
+		wchar_t * word = str.ToWChar();
+		wchar_t * found = wcsstr(wch, word);
+		if (found)
+			id = found - wch;
+		delete[] word;
+	}
+	return id;
 }
-String::operator bool() {
-	return !(*this == String(""));
+int S::Count(const S & str) const {
+	int count = 0;
+	int id = IndexOf(str);
+	if (id >= 0)
+		if (!isWch)
+			return 1 + S(ch + id + str.Length()).Count(str);
+		else
+			return 1 + S(wch + id + str.Length()).Count(str);
+	return count;
 }
-TCHAR String::operator[](const int i) {
-	return value[i];
+int S::Length() const {
+	if (isWch)
+		return wcslen(wch);
+	else
+		return strlen(ch);
 }
-void String::operator= (const String &str) {
-	Set(str.value);
-}
-bool String::operator== (const String &str) {
-	return (_tcscmp(value, str.value) == 0);
+S S::SubString(int start, int length) const {
+	if (isWch) {
+		wchar_t *str = new wchar_t[length + 1];
+		wcsncpy(str, wch + start, length);
+		str[length] = 0;
+		S out(str);
+		delete[] str;
+		return out;
+	} else {
+		char *str = new char[length + 1];
+		strncpy(str, ch + start, length);
+		str[length] = 0;
+		S out(str);
+		delete[] str;
+		return out;
+	}
 }
 
-bool String::operator!=(const String & str) {
+/* OPERATOR */
+S::operator wchar_t * () const {
+	return ToWChar();
+}
+S::operator char*() const {
+	return ToChar();
+}
+S::operator bool() const {
+	return Length();
+}
+wchar_t S::operator[](const int i) const {
+	return (isWch ? wch[i] : ch[i]);
+}
+void S::operator= (const S &str) {
+	Set(str);
+}
+bool S::operator== (const S &str) const {
+	if (isWch) {
+		wchar_t *otherStr = str.ToWChar();
+		bool out = (wcscmp(wch, otherStr) == 0);
+		delete[] otherStr;
+		return out;
+	} else {
+		char *otherStr = str.ToChar();
+		bool out = (strcmp(ch, otherStr) == 0);
+		delete[] otherStr;
+		return out;
+	}
+}
+bool S::operator!=(const S & str) const {
 	return !(*this == str);
 }
 
-String String::operator+ (const String &str) {
-	TCHAR *newstr = new TCHAR[_tcslen(str.value) + _tcslen(value) + 1];
-	_tcscpy(newstr, value);
-	_tcscat(newstr, str.value);
-	String out(newstr);
-	delete[] newstr;
-	return out;
+S & S::operator+ (const S &str) {
+	if (isWch) {
+		wchar_t *newStr = new wchar_t[str.Length() + Length() + 1];
+		wchar_t *otherStr = str.ToWChar();
+		wcscpy(newStr, wch);
+		wcscat(newStr, otherStr);
+		Set(newStr);
+		delete[] newStr;
+		delete[] otherStr;
+	} else {
+		char *newStr = new char[str.Length() + Length() + 1];
+		char *otherStr = str.ToChar();
+		strcpy(newStr, ch);
+		strcat(newStr, otherStr);
+		Set(newStr);
+		delete[] newStr;
+		delete[] otherStr;
+	}
+	return *this;
 }
-String String::operator+= (const String &str) {
+S & S::operator+= (const S &str) {
 	*this = *this + str;
 	return *this;
 }
-/*
-String String::operator- (const String &str) {
-	TCHAR out[_tcslen(value) + 1] = {'\0'};
-	TCHAR *start = value;
-	TCHAR *pos;
-	TCHAR tmp[_tcslen(value) + 1];
-	while (pos = _tcsstr(start, str.value)) {
-		strncpy(tmp, start, pos - start);
-		tmp[pos - start] = '\0';
-		_tcscat(out, tmp);
-		start = pos + _tcslen(str.value);
-	}
-	_tcscat(out, start);
-	return String(out);
-}
-String String::operator* (const String &str) {
-	TCHAR out[std::min(_tcslen(str.value), _tcslen(value)) + 1] = {'\0'};
-	for (int i = 0, l = 0, n = _tcslen(value); i < n; i++)
-		if (strchr(str.value, value[i]) && !_tcschr(out, value[i])) {
-			out[l] = value[i];
-			out[l++ + 1] = '\0';
-		}
-	return String(out);
-}
-String String::operator/ (const String &str) {
-	TCHAR out[_tcslen(str.value) + _tcslen(value) + 1];
-	int l = 0;
-	for (int i = 0, n = _tcslen(value); i < n; i++)
-		if (!_tcschr(str.value, value[i]))
-			out[l++] = value[i];
-	for (int i = 0, n = _tcslen(str.value); i < n; i++)
-		if (!_tcschr(value, str.value[i]))
-			out[l++] = str.value[i];
-	out[l] = '\0';
-	return String(out);
-}
-
-int main() {
-	cout << "yes";
-}
-*/
