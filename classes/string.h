@@ -12,6 +12,7 @@ public:
 	String(const char *s);
 #endif
 	String(const TCHAR *s);
+	String(const TCHAR c);
 	String(double number);
 	String(int number);
 	// Copy
@@ -21,12 +22,13 @@ public:
 	~String();
 	
 	/* METHOD */
-	void SetValue(const TCHAR *s);
+	void Set(const TCHAR *s);
+	void Set(const TCHAR c);
 #ifdef _UNICODE
-	void SetValue(const char *s);
+	void Set(const char *s);
 #endif
-	void SetValue(double num);
-	void SetValue(int num);
+	void Set(double num);
+	void Set(int num);
 	void Empty();
 	int ToInt();
 	double ToDouble();
@@ -38,13 +40,15 @@ public:
 #else
 	const char * ToChar();
 #endif
-	int Find(const String &str);
+	int IndexOf(const String &str) const;
+	int Count(const String &str) const;
 	const int Length() const;
 	String SubString(int start, int length);
 	
 	/* OPERATOR */
 	operator TCHAR* ();
 	operator bool();
+	TCHAR operator[] (const int i);
 	void operator= (const String &str);
 	bool operator== (const String &str);
 	bool operator!= (const String &str);

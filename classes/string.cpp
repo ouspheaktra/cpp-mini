@@ -9,22 +9,25 @@ String::String() {
 	Empty();
 }
 String::String(const TCHAR *s) {
-	SetValue(s);
+	Set(s);
+}
+String::String(const TCHAR c) {
+	Set(c);
 }
 #ifdef _UNICODE
 String::String(const char *s) {
-	SetValue(s);
+	Set(s);
 }
 #endif
 String::String(double number) {
-	SetValue(number);
+	Set(number);
 }
 String::String(int number) {
-	SetValue(number);
+	Set(number);
 }
 // Copy
 String::String(const String &s) {
-	SetValue(s.value);
+	Set(s.value);
 }
 
 /* DESTRUCTOR */
@@ -34,7 +37,7 @@ String::~String() {
 }
 
 /* METHOD */
-void String::SetValue(const TCHAR *s) {
+void String::Set(const TCHAR *s) {
 	if (value)
 		delete [] value;
 	if (s) {
@@ -44,18 +47,22 @@ void String::SetValue(const TCHAR *s) {
 	else
 		Empty();
 }
+void String::Set(const TCHAR c) {
+	TCHAR n[2] = { c, 0 };
+	Set(n);
+}
 #ifdef _UNICODE
-void String::SetValue(const char *s) {
+void String::Set(const char *s) {
 	int len = (int)strlen(s) + 1;
 	TCHAR *t = new TCHAR[len];
 	for (int i = 0; i < len; i++)
 		t[i] = s[i];
-	SetValue(t);
+	Set(t);
 	delete[] t;
 }
 #endif
 /*
-void String::SetValue(const TCHAR *format, ...) {
+void String::Set(const TCHAR *format, ...) {
 	va_list list;
 	va_start(list, format);
 	for (int i = 0, n = strlen(format); i < n; i++) {
@@ -71,26 +78,26 @@ void String::SetValue(const TCHAR *format, ...) {
 	va_end(list);
 }
 */
-void String::SetValue(double num) {
+void String::Set(double num) {
 	if (isfinite(num)) {
 		TCHAR tmp[20] = { '\0' };
 		_sntprintf(tmp, 20, _TEXT("%.2f"), num);
-		SetValue(tmp);
+		Set(tmp);
 	} else {
 		if (isnan(num))
-			SetValue("NAN");
+			Set("NAN");
 		else {
 			if (num == INFINITY)
-				SetValue("INFINITY");
+				Set("INFINITY");
 			else
-				SetValue("-INFINITY");
+				Set("-INFINITY");
 		}
 	}
 }
-void String::SetValue(int num) {
+void String::Set(int num) {
 	TCHAR tmp[20] = {'\0'};
 	_sntprintf(tmp, 20, _TEXT("%d"), num);
-	SetValue(tmp);
+	Set(tmp);
 }
 void String::Empty() {
 	if (value != NULL)
@@ -107,7 +114,7 @@ double String::ToDouble() {
 void String::Cin() {
 	char s[256];
 	std::cin.getline(s, 256);
-	SetValue(s);
+	Set(s);
 }
 const TCHAR * String::GetValue() {
 	return value;
@@ -128,11 +135,18 @@ const char * String::ToChar() {
 	return value;
 }
 #endif
-int String::Find(const String & str) {
+int String::IndexOf(const String & str) const {
 	TCHAR * found = _tcsstr(value, str.value);
 	if (found)
 		return (found - value);
 	return -1;
+}
+int String::Count(const String & str) const {
+	int id = IndexOf(str);
+	if (id < 0)
+		return 0;
+	else
+		return 1 + String(value + id + str.Length()).Count(str);
 }
 const int String::Length() const {
 	return _tcslen(value);
@@ -161,8 +175,11 @@ String::operator TCHAR* () {
 String::operator bool() {
 	return !(*this == String(""));
 }
+TCHAR String::operator[](const int i) {
+	return value[i];
+}
 void String::operator= (const String &str) {
-	SetValue(str.value);
+	Set(str.value);
 }
 bool String::operator== (const String &str) {
 	return (_tcscmp(value, str.value) == 0);
