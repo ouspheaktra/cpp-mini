@@ -110,16 +110,19 @@ const int maxChar = 10;
 BOOL CALLBACK EditNumberProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_CHAR: {
-		TCHAR key, tmp[maxChar + 1];
-		String text;
-		key = (TCHAR)wParam;
-		GetWindowText(hWnd, tmp, maxChar);
-		text.SetValue(tmp);
-		if ((text.Length() < maxChar) &&
+		TCHAR tmp[100], first[100], key = (TCHAR)wParam;
+		int pos = SendMessage(hWnd, EM_GETSEL, NULL, NULL);
+		GetWindowText(hWnd, tmp, 100);
+		_tcsncpy(first, tmp, LOWORD(pos));
+		first[LOWORD(pos)] = 0;
+		String newText = String(first) + String(key) + String(tmp + HIWORD(pos));
+		SetWindowText(GetParent(GetParent(hWnd)), String(newText.Count("-")));
+		if ((newText.Length() <= maxChar) &&
 			(
 				(key >= '0' && key <= '9') || 
-				(key == '.' && (text.Find(".") < 0)) || 
-				((key == '-' || key == '+') && !text) ||
+				(key == '.' && (newText.Count(".") <= 1)) ||
+				((key == '-') && (newText.Count("-") <= 1) && (newText[0] == L'-')) ||
+				((key == '+') && (newText.Count("+") <= 1) && (newText[0] == L'+')) ||
 				key == VK_BACK
 			)
 		)
@@ -130,10 +133,9 @@ BOOL CALLBACK EditNumberProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		if (key == VK_RETURN) {
 			String text;
 			TCHAR tmp[maxChar + 1];
-			int id;
+			int id = GetDlgCtrlID(hWnd);;
 			GetWindowText(hWnd, tmp, maxChar);
-			text.SetValue(tmp);
-			id = GetDlgCtrlID(hWnd);
+			text.Set(tmp);
 			if (id == IDC_EDIT_ANGLE) {
 				angle = text.ToDouble();
 				if (isDegree)
@@ -235,8 +237,6 @@ INT_PTR CALLBACK PaintProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 				reCalculate = true;
 				calcByAngle = true;
 				InvalidateRect(hWnd, NULL, true);
-				static int i = 0;
-				SetWindowText(GetParent(hWnd), String(i));
 			}
 			preMouse = mouse;
 		}
