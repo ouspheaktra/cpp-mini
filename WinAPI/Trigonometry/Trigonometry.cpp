@@ -2,11 +2,11 @@
 #include "Trigonometry.h"
 
 DRAW Draw;
-HWND hOption, hMain;
-Point oriPoint, sinP, coversinP, excscP, cosP, versinP, exsecP, zeroP(0), point;
+HWND hOption, hMain, hPaint;
+WNDPROC oldEditProc;
+Point pivot, oriPoint, sinP, coversinP, excscP, cosP, versinP, exsecP, zeroP(0), point;
 Line radiusL, tanL, cosL(Point(0), Point(1, 0)), sinL(Point(0), Point(0, 1));
 int radius, width, height, optionWidth = 300;
-const int maxChar = 10;
 double angle;
 bool	isDegree = true,
 		calcByAngle = false,
@@ -34,10 +34,9 @@ struct {
 };
 
 void DrawOut(HWND hWnd) {
-	static Point pivot, min, max;
+	static Point min, max;
 	static int length;
 	static double degree;
-	pivot.Set(width / 2, height / 2);
 	Draw.Begin(hWnd);
 	Draw.Reset();
 	Draw.SetPivot(pivot, 1);
@@ -71,7 +70,7 @@ void DrawOut(HWND hWnd) {
 			SetWindowText(GetDlgItem(hOption, segments[i].editId), String(segments[i].calcToValue(angle)));
 
 		//static int i = 0;
-		//SetWindowText(hMain, String(i++));
+		//SetWindowText(GetParent(hWnd), String(point.x) + String(" ") + String(point.y));
 	}
 	
 	// circle
@@ -107,13 +106,12 @@ void DrawOut(HWND hWnd) {
 	calcByAngle = false;
 }
 
-WNDPROC oldEditProc;
-
+const int maxChar = 10;
 BOOL CALLBACK EditNumberProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
 	case WM_CHAR: {
-		static TCHAR key, tmp[maxChar + 1];
-		static String text;
+		TCHAR key, tmp[maxChar + 1];
+		String text;
 		key = (TCHAR)wParam;
 		GetWindowText(hWnd, tmp, maxChar);
 		text.SetValue(tmp);
@@ -129,10 +127,10 @@ BOOL CALLBACK EditNumberProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	} break;
 	case WM_KEYUP: {
 		char key = (char)wParam;
-		if ((char)wParam == VK_RETURN) {
-			static String text;
-			static TCHAR tmp[maxChar + 1];
-			static int id;
+		if (key == VK_RETURN) {
+			String text;
+			TCHAR tmp[maxChar + 1];
+			int id;
 			GetWindowText(hWnd, tmp, maxChar);
 			text.SetValue(tmp);
 			id = GetDlgCtrlID(hWnd);
@@ -149,7 +147,7 @@ BOOL CALLBACK EditNumberProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 			calcByAngle = true;
 			reCalculate = true;
-			InvalidateRect(hMain, NULL, true);
+			InvalidateRect(hPaint, NULL, true);
 		} else
 			return CallWindowProc(oldEditProc, hWnd, message, wParam, lParam);
 	} break;
@@ -167,20 +165,26 @@ INT_PTR CALLBACK OptionProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		HWND handle = HWND(lParam);
 		switch (HIWORD(wParam)) {
 		case BN_CLICKED: {
-			if (id == IDC_RADIO_DEGREE) {
+			if (id == IDC_RADIO_DEGREE)
 				isDegree = true;
-				reCalculate = true;
-			} else if (id == IDC_RADIO_RADIAN) {
+			else if (id == IDC_RADIO_RADIAN)
 				isDegree = false;
-				reCalculate = true;
-			}
-			InvalidateRect(hMain, NULL, true);
+			reCalculate = true;
+			calcByAngle = true;
+			InvalidateRect(hPaint, NULL, true);
 		}	break;
 		default:
 			return 0;
 		}
 	} break;
+	case WM_PAINT: {
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+		EndPaint(hWnd, &ps);
+	} break;
 	case WM_INITDIALOG: {
+		CheckDlgButton(hWnd, IDC_CHECK_COS, BST_CHECKED);
+		CheckDlgButton(hWnd, IDC_CHECK_SIN, BST_CHECKED);
 		oldEditProc = (WNDPROC)SetWindowLong(GetDlgItem(hWnd, IDC_EDIT_ANGLE), GWLP_WNDPROC, (LONG)EditNumberProc);
 		for (int i = 0; i < segmentsSize; i++)
 			SetWindowLong(GetDlgItem(hWnd, segments[i].editId), GWLP_WNDPROC, (LONG)EditNumberProc);
@@ -191,8 +195,10 @@ INT_PTR CALLBACK OptionProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	return 1;
 }
 
-INT_PTR CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
+bool	preCatch = false,
+		isCatching = false;
+INT_PTR CALLBACK PaintProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	static Point preMouse;
 	switch (message) {
 	case WM_PAINT: {
 		PAINTSTRUCT ps;
@@ -200,32 +206,85 @@ INT_PTR CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		DrawOut(hWnd);
 		EndPaint(hWnd, &ps);
 	} break;
-	case WM_LBUTTONUP:
-		oriPoint.x = (int)LOWORD(lParam);
-		oriPoint.y = (int)HIWORD(lParam);
-		reCalculate = true;
-		InvalidateRect(hWnd, NULL, true);
-		break;
+	case WM_LBUTTONDOWN: {
+		if (preCatch) {
+			isCatching = true;
+			preMouse.x = LOWORD(lParam);
+			preMouse.y = HIWORD(lParam);
+		}
+	} break;
+	case WM_LBUTTONUP: {
+		if (!isCatching) {
+			oriPoint.x = (int)LOWORD(lParam);
+			oriPoint.y = (int)HIWORD(lParam);
+			reCalculate = true;
+			InvalidateRect(hWnd, NULL, true);
+			SetFocus(hWnd);
+		} else
+			isCatching = false;
+	}
+	break;
+	case WM_MOUSEMOVE: {
+		if (isCatching) {
+			Point mouse(LOWORD(lParam), HIWORD(lParam));
+			Point newPivot = pivot;
+			newPivot.x += mouse.x - preMouse.x;
+			newPivot.y += mouse.y - preMouse.y;
+			if (newPivot.x > 25 && newPivot.x < width - 25 && newPivot.y > 25 && newPivot.y < height - 25) {
+				pivot = newPivot;
+				reCalculate = true;
+				calcByAngle = true;
+				InvalidateRect(hWnd, NULL, true);
+				static int i = 0;
+				SetWindowText(GetParent(hWnd), String(i));
+			}
+			preMouse = mouse;
+		}
+	} break;
+	case WM_KEYDOWN: {
+		if ((char)wParam == VK_SPACE) {
+			preCatch = true;
+		}
+	} break;
+	case WM_KEYUP: {
+		if ((char)wParam == VK_SPACE) {
+			preCatch = false;
+		}
+	} break;
 	case WM_SIZE:
 	case WM_INITDIALOG: {
 		RECT rect;
 		GetClientRect(hWnd, &rect);
-		width = rect.right - optionWidth;
+		width = rect.right;
 		height = rect.bottom;
-		if (!hOption)
-			hOption = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_OPTION), hWnd, OptionProc);
-		SetWindowPos(hOption, NULL, rect.right - optionWidth, 0, optionWidth, rect.bottom, SWP_SHOWWINDOW);
+		pivot.Set(width / 2, height / 2);
+		reCalculate = true;
+		calcByAngle = true;
 		if (message == WM_SIZE) {
-			reCalculate = true;
-			calcByAngle = true;
 			InvalidateRect(hWnd, NULL, true);
 		} else {
-			hMain = hWnd;
-			oriPoint.x = width / 4 * 3;
-			oriPoint.y = height / 4;
 			CheckDlgButton(hOption, IDC_RADIO_DEGREE, BST_CHECKED);
-			reCalculate = true;
+			angle = PI / 4;
+			radius = min(width, height) / 3 * 2;
 		}
+	} break;
+	default:
+		return 0;
+	}
+	return 1;
+}
+
+INT_PTR CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message) {
+	case WM_INITDIALOG:
+		hOption = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_OPTION), hWnd, OptionProc);
+		hPaint = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_PAINT), hWnd, PaintProc);
+	case WM_SIZE: {
+		RECT rect;
+		GetClientRect(hWnd, &rect);
+		SetWindowPos(hOption, NULL, rect.right - optionWidth, 0, optionWidth, rect.bottom, SWP_SHOWWINDOW);
+		SetWindowPos(hPaint, NULL, 0, 0, rect.right - optionWidth, rect.bottom, SWP_SHOWWINDOW);
 	} break;
 	case WM_CLOSE:
 		PostQuitMessage(0);
