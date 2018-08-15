@@ -46,8 +46,10 @@ void DrawOut(HWND hWnd) {
 			point = Draw.Map(oriPoint);
 			radius = (int)Point(0).DistanceFrom(point);
 			angle = point.AngleFrom(0);
-		} else
+		} else {
+			for (; angle > PI; angle -= PI);
 			point = Circle(Point(0), radius).GetPointAtAngle(angle);
+		}
 
 		// calculate
 		min = Draw.Map({ 0, height });
@@ -55,10 +57,10 @@ void DrawOut(HWND hWnd) {
 		length = (int)max(point.DistanceFrom(min), point.DistanceFrom(max)) * (point.x > 0 ? 1 : -1);
 		cosP = Point(point.x, 0);
 		versinP = Point(radius, 0);
-		exsecP = versinP + Point(exsec(angle)*radius, 0);
+		exsecP = versinP + Point(int(exsec(angle)*radius), 0);
 		sinP = Point(0, point.y);
 		coversinP = Point(0, radius);
-		excscP = coversinP + Point(0, excsc(angle)*radius);
+		excscP = coversinP + Point(0, int(excsc(angle)*radius));
 		radiusL.Set(zeroP, point);
 		tanL.Set(excscP, exsecP);
 		degree = toDegree(angle);
@@ -242,14 +244,12 @@ INT_PTR CALLBACK PaintProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 		}
 	} break;
 	case WM_KEYDOWN: {
-		if ((char)wParam == VK_SPACE) {
+		if ((char)wParam == VK_SPACE)
 			preCatch = true;
-		}
 	} break;
 	case WM_KEYUP: {
-		if ((char)wParam == VK_SPACE) {
+		if ((char)wParam == VK_SPACE)
 			preCatch = false;
-		}
 	} break;
 	case WM_SIZE:
 	case WM_INITDIALOG: {

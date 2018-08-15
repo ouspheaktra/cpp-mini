@@ -56,7 +56,7 @@ public:
 	void operator= (const S &str);
 	bool operator== (const S &str) const;
 	bool operator!= (const S &str) const;
-	S & operator+ (const S &str);
+	S operator+ (const S &str);
 	S & operator+= (const S &str);
 };
 

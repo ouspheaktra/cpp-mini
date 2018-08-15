@@ -16,13 +16,6 @@ S::S(const TCHAR *s) {
 S::S(const TCHAR c) {
 	Set(c);
 }
-S::S(const char * s) {
-	Set(s);
-}
-S::S(const char c) {
-	char str[2] = { c, 0 };
-	Set(str);
-}
 S::S(double number) {
 	Set(number);
 }
@@ -40,7 +33,7 @@ S::~S() {
 }
 
 void S::Set(const S & s) {
-	Set(s.GetValue());
+	Set(s.value);
 }
 
 /* METHOD */
@@ -55,13 +48,6 @@ void S::Set(const TCHAR *s) {
 void S::Set(const TCHAR c) {
 	TCHAR n[2] = { c, 0 };
 	Set(n);
-}
-
-void S::Set(const char * s) {
-	TCHAR * str = new TCHAR[strlen(s) + 1];
-	mbstowcs(str, s, strlen(s) + 1);
-	Set(str);
-	delete[] str;
 }
 
 /*
@@ -120,12 +106,6 @@ const TCHAR * S::GetValue() const {
 	return value;
 }
 
-const char * S::ToChar() const {
-	char * out = new char[Length() + 1];
-	wcstombs(out, value, Length() + 1);
-	return out;
-}
-
 int S::IndexOf(const S & str) const {
 	int id = -1;
 	TCHAR * found = wcsstr(value, str.value);
@@ -156,9 +136,6 @@ S S::SubString(int start, int length) const {
 S::operator const TCHAR * () const {
 	return GetValue();
 }
-S::operator const char*() const {
-	return ToChar();
-}
 S::operator bool() const {
 	return Length();
 }
@@ -175,7 +152,7 @@ bool S::operator!=(const S & str) const {
 	return !(*this == str);
 }
 
-S & S::operator+ (const S &str) {
+S S::operator+ (const S &str) {
 	TCHAR *newStr = new TCHAR[str.Length() + Length() + 1];
 	_tcscpy(newStr, value);
 	_tcscat(newStr, str.value);
@@ -187,3 +164,31 @@ S & S::operator+= (const S &str) {
 	*this = *this + str;
 	return *this;
 }
+
+#ifdef _UNICODE
+S::S(const char * s) {
+	Set(s);
+}
+S::S(const char c) {
+	Set(c);
+}
+void S::Set(const char * s) {
+	TCHAR * str = new TCHAR[strlen(s) + 1];
+	mbstowcs(str, s, strlen(s) + 1);
+	Set(str);
+	delete[] str;
+}
+
+void S::Set(const char c) {
+	char str[2] = { c, 0 };
+	Set(str);
+}
+const char * S::ToChar() const {
+	char * out = new char[Length() + 1];
+	wcstombs(out, value, Length() + 1);
+	return out;
+}
+S::operator const char*() const {
+	return ToChar();
+}
+#endif

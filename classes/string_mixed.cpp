@@ -216,7 +216,7 @@ bool S::operator!=(const S & str) const {
 	return !(*this == str);
 }
 
-S & S::operator+ (const S &str) {
+S S::operator+ (const S &str) {
 	if (isWch) {
 		wchar_t *newStr = new wchar_t[str.Length() + Length() + 1];
 		wcscpy(newStr, wch);

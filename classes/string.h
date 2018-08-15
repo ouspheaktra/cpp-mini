@@ -15,10 +15,6 @@ public:
 	S();
 	S(const TCHAR *s);
 	S(const TCHAR c);
-#ifdef _UNICODE
-	S(const char *s);
-	S(const char c);
-#endif
 	S(double number);
 	S(int number);
 	// Copy
@@ -31,10 +27,6 @@ public:
 	void Set(const S &s);
 	void Set(const TCHAR *s);
 	void Set(const TCHAR c);
-#ifdef _UNICODE
-	void Set(const char *s);
-	void Set(const char c);
-#endif
 	void Set(double num, int decimalPoint=2);
 	void Set(int num);
 	void Empty();
@@ -42,9 +34,6 @@ public:
 	int ToInt() const;
 	double ToDouble() const;
 	const TCHAR * GetValue() const;
-#ifdef _UNICODE
-	const char * ToChar() const;
-#endif
 
 	int IndexOf(const S &str) const;
 	int Count(const S &str) const;
@@ -54,16 +43,22 @@ public:
 	
 	/* OPERATOR */
 	operator const TCHAR * () const;
-#ifdef _UNICODE
-	operator const char * () const;
-#endif
 	operator bool() const;
 	TCHAR operator[] (const int i) const;
 	void operator= (const S &str);
 	bool operator== (const S &str) const;
 	bool operator!= (const S &str) const;
-	S & operator+ (const S &str);
+	S operator+ (const S &str);
 	S & operator+= (const S &str);
+
+#ifdef _UNICODE
+	S(const char *s);
+	S(const char c);
+	void Set(const char *s);
+	void Set(const char c);
+	const char * ToChar() const;
+	operator const char * () const;
+#endif
 };
 
 typedef S String;
